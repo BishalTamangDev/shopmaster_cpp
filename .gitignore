@@ -1,0 +1,11 @@
+# ignore output folder
+**/output/
+
+# ignore executable files
+*.exe
+
+# ignore text files
+*.text
+
+# ugnore vscode editor setting
+.vscode
