@@ -2,7 +2,10 @@
 #include <iomanip>
 #include <string>
 #include <limits>
+#include <vector>
 #include <map>
+#include <fstream>
+#include <sstream>
 
 #ifdef _WIN32
 #include <conio.h>
@@ -25,6 +28,7 @@ enum class MESSAGE_TYPE
     FAILURE
 };
 
+// message type map
 std::map<MESSAGE_TYPE, std::string> message_type_map = {
     {MESSAGE_TYPE::RESET, "\033[0m"},
     {MESSAGE_TYPE::INFO, "\033[33m"},
@@ -32,7 +36,8 @@ std::map<MESSAGE_TYPE, std::string> message_type_map = {
     {MESSAGE_TYPE::FAILURE, "\033[31m"},
 };
 
-namespace Utils
+// utils
+namespace utils
 {
     // function declarations
     void clearScreen();                                 // clear screen
@@ -44,7 +49,7 @@ namespace Utils
 
 // function definitions
 // clear screen
-void Utils::clearScreen()
+void utils::clearScreen()
 {
 #ifdef _WIN32
     system("cls");
@@ -54,7 +59,7 @@ void Utils::clearScreen()
 }
 
 // pause screen
-void Utils::pauseScreen()
+void utils::pauseScreen()
 {
 #ifdef _WIN32
     _getch(); // Windows only
@@ -64,7 +69,7 @@ void Utils::pauseScreen()
 }
 
 // header
-void Utils::header(std::string title)
+void utils::header(std::string title)
 {
     const int total_dash = 50;
 
@@ -76,13 +81,13 @@ void Utils::header(std::string title)
 }
 
 // show message
-inline void Utils::showMessage(MESSAGE_TYPE type, std::string message)
+inline void utils::showMessage(MESSAGE_TYPE type, std::string message)
 {
-    std::cout << message_type_map[type] << message << message_type_map[MESSAGE_TYPE::RESET] << "\n";
+    std::cout << message_type_map[type] << message << message_type_map[MESSAGE_TYPE::RESET];
 }
 
 // show options
-inline void Utils::showOption(int serial, std::string title)
+inline void utils::showOption(int serial, std::string title)
 {
     std::cout << std::left << std::setw(47) << title << "[" << serial << "]\n";
 }

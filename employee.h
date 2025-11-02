@@ -1,0 +1,4 @@
+#ifndef SHOPMASTER_EMPLOYEE_H
+#define SHOPMASTER_EMPLOYEE_H
+
+#endif
