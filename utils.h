@@ -3,9 +3,12 @@
 #include <string>
 #include <limits>
 #include <vector>
+#include <any>
 #include <map>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
+#include <cctype>
 
 #ifdef _WIN32
 #include <conio.h>
@@ -45,6 +48,10 @@ namespace utils
     void header(std::string);                           // header
     inline void showMessage(MESSAGE_TYPE, std::string); // show message
     inline void showOption(int, std::string);           // show option
+    std::vector<std::any> getLineData(std::string);     // get line data
+    void convertToLowerCase(std::string &);             // convert strign into lowercase string
+    void convertToWordCase(std::string &);              // convert string into wordcase string
+    void eraseWhiteSpace(std::string &);                // erase white space
 }
 
 // function definitions
@@ -75,6 +82,7 @@ void utils::header(std::string title)
 
     int remaining_dash = 50 - title.length();
 
+    utils::clearScreen();
     std::cout << std::string(total_dash, '=') << "\n";
     std::cout << std::setw(remaining_dash / 2) << "" << title << "\n";
     std::cout << std::string(total_dash, '=') << "\n\n";
@@ -90,6 +98,39 @@ inline void utils::showMessage(MESSAGE_TYPE type, std::string message)
 inline void utils::showOption(int serial, std::string title)
 {
     std::cout << std::left << std::setw(47) << title << "[" << serial << "]\n";
+}
+
+// get line data
+std::vector<std::any> utils::getLineData(std::string line)
+{
+    std::string cell;
+    std::stringstream ss(line);
+    std::vector<std::any> data;
+
+    while (std::getline(ss, cell, ','))
+        data.push_back(cell);
+
+    return data;
+}
+
+// convert string into lowercase string
+void utils::convertToLowerCase(std::string &str)
+{
+    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c)
+                   { return static_cast<char>(std::tolower(c)); });
+}
+
+// convert string into wordcase string
+void utils::convertToWordCase(std::string &str)
+{
+    std::transform(str.begin(), str.begin() + 1, str.begin(), [](unsigned char c)
+                   { return std::toupper(c); });
+}
+
+// erase white space
+void utils::eraseWhiteSpace(std::string &str)
+{
+    str.erase(std::remove_if(str.begin(), str.end(), ::isspace), str.end());
 }
 
 #endif

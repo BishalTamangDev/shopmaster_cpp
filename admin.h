@@ -1,6 +1,9 @@
 #include <iostream>
 #include <fstream>
+#include <any>
+#include <sstream>
 #include <string>
+#include <algorithm>
 
 // import user-defined files :: header
 #include "utils.h"
@@ -25,13 +28,12 @@ public:
     void setFirstName(std::string);
     void setMiddleName(std::string);
     void setLastName(std::string);
-    void setName(std::string, std::string, std::string);
 
     // getters
     std::string getUsername();
     std::string getPassword();
     std::string getFirstName();
-    std::string getMiddle();
+    std::string getMiddleName();
     std::string getLastName();
     std::string getFullName();
 
@@ -44,39 +46,40 @@ public:
 // setter :: set username
 void Admin::setUsername(std::string username)
 {
+    utils::eraseWhiteSpace(username);
+    utils::convertToLowerCase(username);
     this->username = username;
 }
 
 // setter :: set password
 void Admin::setPassword(std::string password)
 {
+    utils::eraseWhiteSpace(password);
     this->password = password;
 }
 
 // setter :: first name
 void Admin::setFirstName(std::string first_name)
 {
+    utils::eraseWhiteSpace(first_name);
+    utils::convertToLowerCase(first_name);
     this->first_name = first_name;
 }
 
 // setter :: middle name
 void Admin::setMiddleName(std::string middle_name)
 {
+    utils::eraseWhiteSpace(middle_name);
+    utils::convertToLowerCase(middle_name);
     this->middle_name = middle_name;
 }
 
 // setter :: last name
 void Admin::setLastName(std::string last_name)
 {
+    utils::eraseWhiteSpace(last_name);
+    utils::convertToLowerCase(last_name);
     this->last_name = last_name;
-}
-
-// setter :: name
-void Admin::setName(std::string first_name, std::string middle_middle, std::string last_last)
-{
-    this->first_name = first_name;
-    this->middle_name = middle_middle;
-    this->last_name = last_last;
 }
 
 // getters
@@ -95,49 +98,119 @@ std::string Admin::getPassword()
 // getter :: get first name
 std::string Admin::getFirstName()
 {
+    utils::convertToWordCase(this->first_name);
     return this->first_name;
 }
 
 // getter :: get middle name
-std::string Admin::getMiddle()
+std::string Admin::getMiddleName()
 {
+    utils::convertToWordCase(this->middle_name);
     return this->middle_name;
 }
 
 // getter :: get last name
 std::string Admin::getLastName()
 {
+    utils::convertToWordCase(this->last_name);
     return this->last_name;
 }
 
 // getter :: get full name
 std::string Admin::getFullName()
 {
-    return this->first_name + " " + this->middle_name + " " + this->last_name;
+    utils::convertToWordCase(this->first_name);
+    utils::convertToWordCase(this->middle_name);
+    utils::convertToWordCase(this->last_name);
+
+    if (this->middle_name.length() == 0)
+        return this->first_name + " " + this->last_name;
+    else
+        return this->first_name + " " + this->middle_name + " " + this->last_name;
 }
 
 // register
 bool Admin::registerAdmin()
 {
-    return true;
+    std::string username, password, first_name, middle_name, last_name;
+
+    utils::header("ADMIN REGISTRATION");
+
+    utils::showMessage(MESSAGE_TYPE::INFO, "Admin has not been registered yet!");
+
+    std::cout << "\n\nUsername :: ";
+    std::getline(std::cin, username);
+    this->setUsername(username);
+
+    std::cout << "\nPassword :: ";
+    std::getline(std::cin, password);
+    this->setPassword(password);
+
+    std::cout << "\nFirst name :: ";
+    std::getline(std::cin, first_name);
+    this->setFirstName(first_name);
+
+    std::cout << "\nMiddle name [Press enter if you don't have a middle name] :: ";
+    std::getline(std::cin, middle_name);
+    this->setMiddleName(middle_name);
+
+    std::cout << "\nLast name :: ";
+    std::getline(std::cin, last_name);
+    this->setLastName(last_name);
+
+    std::ofstream file(app_files::admin_file, std::ios::app);
+
+    file << this->username << "," << this->password << "," << this->first_name << "," << this->middle_name << "," << this->last_name << "\n";
+
+    file.close();
+
+    // show admin details
+    utils::header("ADMIN REGISTRATION DETAILS");
+    std::cout << "Username    :: " << this->username << "\n\n";
+    std::cout << "Password    :: " << this->password << "\n\n";
+    std::cout << "Name        :: " << this->getFullName() << "\n";
+
+    return file.good();
 }
 
 // login
 bool Admin::loginAdmin()
 {
-    return true;
+    std::string username, password;
+
+    utils::header("ADMIN LOGIN");
+
+    std::cout << "Username :: ";
+    std::getline(std::cin, username);
+
+    std::cout << "\nPassword :: ";
+    std::getline(std::cin, password);
+
+    return username == this->username && password == this->password;
 }
 
 // check for admin registration
 bool Admin::isRegistered()
 {
-    bool status = false;
+    std::string line;
+    std::vector<std::any> data;
+    std::ifstream file(app_files::admin_file);
 
-    std::ifstream file(app_files::admin_file, std::ios::in);
+    std::getline(file, line); // healine
+    std::getline(file, line);
+    file.close(); // close file
 
-    file.close();
+    if (line.length() == 0)
+        return false;
+    else
+    {
+        data = utils::getLineData(line);
 
-    return status;
+        this->setUsername(std::any_cast<std::string>(data[0]));
+        this->setPassword(std::any_cast<std::string>(data[1]));
+
+        return true;
+    }
 }
 
 #endif
