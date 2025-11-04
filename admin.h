@@ -40,6 +40,8 @@ public:
     bool registerAdmin(); // register
     bool loginAdmin();    // login
     bool isRegistered();  // check for admin registration
+    void fetchDetails();  // fetch admin details
+    bool update();        // update
 };
 
 // setters
@@ -158,17 +160,15 @@ bool Admin::registerAdmin()
     std::getline(std::cin, last_name);
     this->setLastName(last_name);
 
-    std::ofstream file(app_files::admin_file, std::ios::app);
-
-    file << this->username << "," << this->password << "," << this->first_name << "," << this->middle_name << "," << this->last_name << "\n";
-
-    file.close();
-
     // show admin details
     utils::header("ADMIN REGISTRATION DETAILS");
     std::cout << "Username    :: " << this->username << "\n\n";
     std::cout << "Password    :: " << this->password << "\n\n";
     std::cout << "Name        :: " << this->getFullName() << "\n";
+
+    std::ofstream file(app_files::admin_file, std::ios::app);
+    file << this->username << "," << this->password << "," << this->first_name << "," << this->middle_name << "," << this->last_name << "\n";
+    file.close();
 
     return file.good();
 }
@@ -211,6 +211,48 @@ bool Admin::isRegistered()
 
         return true;
     }
+}
+
+// fetch admin details
+void Admin::fetchDetails()
+{
+    std::ifstream file(app_files::admin_file);
+
+    std::string line;
+
+    std::getline(file, line); // heading
+    std::getline(file, line);
+
+    std::vector<std::any> data = utils::getLineData(line);
+
+    this->username = std::any_cast<std::string>(data[0]);
+    this->password = std::any_cast<std::string>(data[1]);
+    this->first_name = std::any_cast<std::string>(data[2]);
+    this->middle_name = std::any_cast<std::string>(data[3]);
+    this->last_name = std::any_cast<std::string>(data[4]);
+
+    file.close();
+}
+
+// update username
+bool Admin::update()
+{
+    std::string heading;
+
+    // open file and get headline
+    std::fstream file(app_files::admin_file, std::ios::in);
+    std::getline(file, heading);
+    file.close();
+
+    // open file and update line
+    file.open(app_files::admin_file, std::ios::out);
+
+    file << heading << "\n"; // write heading
+    file << this->username << "," << this->password << "," << this->first_name << "," << this->middle_name << "," << this->last_name << "\n";
+
+    file.close();
+
+    return file.good();
 }
 
 #endif
