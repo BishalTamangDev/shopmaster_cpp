@@ -17,6 +17,7 @@ namespace app_files
     // files
     const std::string admin_file = "admin.csv";
     const std::string shop_file = "shop.csv";
+    const std::string employees_file = "employees.csv";
 
     const std::map<std::string, std::vector<std::string>> files = {
         {

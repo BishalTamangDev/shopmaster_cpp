@@ -51,6 +51,7 @@ namespace utils
     std::vector<std::any> getLineData(std::string);     // get line data
     void convertToLowerCase(std::string &);             // convert strign into lowercase string
     void convertToWordCase(std::string &);              // convert string into wordcase string
+    void convertToUpperCase(std::string &);             // convert string into uppercase
     void eraseWhiteSpace(std::string &);                // erase white space
 }
 
@@ -123,7 +124,31 @@ void utils::convertToLowerCase(std::string &str)
 // convert string into wordcase string
 void utils::convertToWordCase(std::string &str)
 {
-    std::transform(str.begin(), str.begin() + 1, str.begin(), [](unsigned char c)
+    bool newWord = true; // Track if we’re at the start of a new word
+
+    std::transform(str.begin(), str.end(), str.begin(), [&](unsigned char c)
+                   {
+                       if (std::isspace(c))
+                       {
+                           newWord = true; // Next character starts a new word
+                           return c;
+                       }
+
+                       if (newWord)
+                       {
+                           newWord = false;
+                           return static_cast<unsigned char>(std::toupper(c));
+                       }
+
+                       return static_cast<unsigned char>(std::tolower(c)); // lowercase rest
+                   });
+}
+
+// convert string into uppercase
+void utils::convertToUpperCase(std::string &str)
+{
+    std::transform(str.begin(), str.end(), str.begin(),
+                   [](unsigned char c)
                    { return std::toupper(c); });
 }
 

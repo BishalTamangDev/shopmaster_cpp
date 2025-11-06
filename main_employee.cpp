@@ -45,7 +45,7 @@ void menu()
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
-        if(choice == "6")
+        if (choice == "6")
             exit(0);
 
         utils::showMessage(MESSAGE_TYPE::INFO, "\nWork in progress!");

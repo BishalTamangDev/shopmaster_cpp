@@ -28,6 +28,7 @@ public:
     void setFirstName(std::string);
     void setMiddleName(std::string);
     void setLastName(std::string);
+    bool setByLineData(std::vector<std::any> &); // set admin using line data
 
     // getters
     std::string getUsername();
@@ -37,11 +38,11 @@ public:
     std::string getLastName();
     std::string getFullName();
 
-    bool registerAdmin(); // register
-    bool loginAdmin();    // login
-    bool isRegistered();  // check for admin registration
-    void fetchDetails();  // fetch admin details
-    bool update();        // update
+    bool registerAdmin();                     // register
+    bool login(std::string &, std::string &); // login
+    bool isRegistered();                      // check for admin registration
+    bool fetch();                             // fetch admin details
+    bool update();                            // update admin details
 };
 
 // setters
@@ -82,6 +83,29 @@ void Admin::setLastName(std::string last_name)
     utils::eraseWhiteSpace(last_name);
     utils::convertToLowerCase(last_name);
     this->last_name = last_name;
+}
+
+// set by line data
+bool Admin::setByLineData(std::vector<std::any> &data)
+{
+    try
+    {
+        this->username = std::any_cast<std::string>(data[0]);
+        this->password = std::any_cast<std::string>(data[1]);
+        this->first_name = std::any_cast<std::string>(data[2]);
+        this->middle_name = std::any_cast<std::string>(data[3]);
+        this->last_name = std::any_cast<std::string>(data[4]);
+
+        return true;
+    }
+    catch (const char *e)
+    {
+#ifdef DEBUG_MODE
+        std::cerr << "\n\nError: " << e << "\n";
+        utils::pauseScreen();
+#endif
+        return false;
+    }
 }
 
 // getters
@@ -134,38 +158,6 @@ std::string Admin::getFullName()
 // register
 bool Admin::registerAdmin()
 {
-    std::string username, password, first_name, middle_name, last_name;
-
-    utils::header("ADMIN REGISTRATION");
-
-    utils::showMessage(MESSAGE_TYPE::INFO, "Admin has not been registered yet!");
-
-    std::cout << "\n\nUsername :: ";
-    std::getline(std::cin, username);
-    this->setUsername(username);
-
-    std::cout << "\nPassword :: ";
-    std::getline(std::cin, password);
-    this->setPassword(password);
-
-    std::cout << "\nFirst name :: ";
-    std::getline(std::cin, first_name);
-    this->setFirstName(first_name);
-
-    std::cout << "\nMiddle name [Press enter if you don't have a middle name] :: ";
-    std::getline(std::cin, middle_name);
-    this->setMiddleName(middle_name);
-
-    std::cout << "\nLast name :: ";
-    std::getline(std::cin, last_name);
-    this->setLastName(last_name);
-
-    // show admin details
-    utils::header("ADMIN REGISTRATION DETAILS");
-    std::cout << "Username    :: " << this->username << "\n\n";
-    std::cout << "Password    :: " << this->password << "\n\n";
-    std::cout << "Name        :: " << this->getFullName() << "\n";
-
     std::ofstream file(app_files::admin_file, std::ios::app);
     file << this->username << "," << this->password << "," << this->first_name << "," << this->middle_name << "," << this->last_name << "\n";
     file.close();
@@ -174,18 +166,8 @@ bool Admin::registerAdmin()
 }
 
 // login
-bool Admin::loginAdmin()
+bool Admin::login(std::string &username, std::string &password)
 {
-    std::string username, password;
-
-    utils::header("ADMIN LOGIN");
-
-    std::cout << "Username :: ";
-    std::getline(std::cin, username);
-
-    std::cout << "\nPassword :: ";
-    std::getline(std::cin, password);
-
     return username == this->username && password == this->password;
 }
 
@@ -214,7 +196,7 @@ bool Admin::isRegistered()
 }
 
 // fetch admin details
-void Admin::fetchDetails()
+bool Admin::fetch()
 {
     std::ifstream file(app_files::admin_file);
 
@@ -222,16 +204,11 @@ void Admin::fetchDetails()
 
     std::getline(file, line); // heading
     std::getline(file, line);
-
-    std::vector<std::any> data = utils::getLineData(line);
-
-    this->username = std::any_cast<std::string>(data[0]);
-    this->password = std::any_cast<std::string>(data[1]);
-    this->first_name = std::any_cast<std::string>(data[2]);
-    this->middle_name = std::any_cast<std::string>(data[3]);
-    this->last_name = std::any_cast<std::string>(data[4]);
-
     file.close();
+
+    std::vector<std::any> data = utils::getLineData(line); // set admin using line data
+
+    return this->setByLineData(data);
 }
 
 // update username
@@ -249,10 +226,11 @@ bool Admin::update()
 
     file << heading << "\n"; // write heading
     file << this->username << "," << this->password << "," << this->first_name << "," << this->middle_name << "," << this->last_name << "\n";
+    bool status = file.good();
 
     file.close();
 
-    return file.good();
+    return status;
 }
 
 #endif

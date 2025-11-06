@@ -7,5 +7,8 @@
 # ignore text files
 *.text
 
-# ugnore vscode editor setting
+# ignore vscode editor setting
 .vscode
+
+# ignore trail file :: file for testing new concepts
+trial.cpp
