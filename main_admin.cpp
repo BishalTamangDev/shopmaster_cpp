@@ -12,11 +12,12 @@
 #include "admin.h"
 #include "shop.h"
 #include "employee.h"
+#include "customer.h"
 
 // namespace :: inventory
 namespace ns_inventory
 {
-    void menu(); // inventory management menu
+    void menu(); // menu
 }
 
 // namespace :: employee
@@ -34,7 +35,10 @@ namespace ns_employee
 // namespace :: customer
 namespace ns_customer
 {
-    void menu(); // customer management menu
+    void menu();            //  menu
+    void viewAll();         // view all customer
+    void searchBySalesId(); // search by sales id
+    void searchByName();    // search by name
 };
 
 // namespace :: admin
@@ -60,11 +64,11 @@ namespace ns_shop
 // main function
 int main()
 {
-    // background :: file setup
+    // background process :: file setup
     std::thread file_setup(app_files::setup); // file setup thread
     file_setup.detach();
 
-    // background :: fetch employees
+    // background process :: fetch employees
     std::thread fetch_employees_thread(Employee::fetchAll);
     fetch_employees_thread.detach();
 
@@ -1043,9 +1047,170 @@ void ns_employee::remove()
 // customer :: menu
 void ns_customer::menu()
 {
-    utils::header("CUSTOMER MANAGEMENT MENU");
+    std::string choice;
 
+    const std::map<int, std::string> options = {
+        {1, "View Customer"},
+        {2, "Search Customer by Sales ID"},
+        {3, "Search Customer by Name"},
+        {4, "Go Back"},
+    };
+
+    while (true)
+    {
+        utils::header("CUSTOMER MANAGEMENT MENU");
+
+        for (const auto &option : options)
+            utils::showOption(option.first, option.second);
+
+        std::cout << "\nYour choice :: ";
+        std::getline(std::cin, choice);
+
+        if (choice == "1")
+            ns_customer::viewAll();
+        else if (choice == "2")
+            ns_customer::searchBySalesId();
+        else if (choice == "3")
+            ns_customer::searchByName();
+        else if (choice == "4")
+            return;
+        else
+        {
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
+            utils::pauseScreen();
+        }
+    }
+}
+
+// view all customer
+void ns_customer::viewAll()
+{
+    utils::header("ALL CUSTOMERS");
+
+    std::vector<Customer> customers = Customer::fetchAll();
+
+    if (customers.size() == 0)
+        utils::showMessage(MESSAGE_TYPE::INFO, "No customers found!");
+    else
+    {
+        utils::showLine({11, 25}, {"Sales ID", "Name"});
+        for (Customer customer : customers)
+            utils::showLine({11, 25}, {std::to_string(customer.getSalesId()), customer.getName()});
+    }
+
+    std::cout << "\nPress any key to continue...";
     utils::pauseScreen();
+}
+
+// search by sales id
+void ns_customer::searchBySalesId()
+{
+    int sales_id;
+    bool found, valid_id;
+    std::string sales_id_str, choice;
+
+    std::vector<Customer> customers = Customer::fetchAll();
+
+    while (true)
+    {
+        found = false;
+        valid_id = true;
+
+        utils::header("SEARCH CUSTOMER BY SALES ID");
+
+        if (customers.size() == 0)
+        {
+            utils::showMessage(MESSAGE_TYPE::INFO, "No customers found!");
+            break;
+        }
+
+        std::cout << "Enter sales ID to search :: ";
+        std::getline(std::cin, sales_id_str);
+
+        try
+        {
+            sales_id = std::stoi(sales_id_str);
+        }
+        catch (const std::invalid_argument &e)
+        {
+            valid_id = false;
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid input");
+        }
+
+        if (valid_id) // search
+        {
+            for (Customer customer : customers)
+            {
+                if (customer.getSalesId() == sales_id)
+                {
+                    found = true;
+                    utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nCustomer found!");
+                    std::cout << "\n\nSales ID     :: " << sales_id;
+                    std::cout << "\n\nName         :: " << customer.getName();
+                    break;
+                }
+            }
+
+            if (!found)
+                utils::showMessage(MESSAGE_TYPE::INFO, "\nCustomer not found!");
+        }
+
+        std::cout << "\n\nDo you want to search another customer [y/n]? ";
+        std::getline(std::cin, choice);
+
+        if (choice != "y" && choice != "Y")
+            break;
+    }
+}
+
+// search by name
+void ns_customer::searchByName()
+{
+    bool found;
+    std::string name, target_name, choice;
+
+    std::vector<Customer> customers = Customer::fetchAll();
+
+    while (true)
+    {
+        found = false;
+
+        utils::header("SEARCH CUSTOMER BY NAME");
+
+        if (customers.size() == 0)
+        {
+            utils::showMessage(MESSAGE_TYPE::INFO, "No customers found!\n");
+            break;
+        }
+
+        std::cout << "Enter customer name to search :: ";
+        std::getline(std::cin, target_name);
+
+        std::cout << "\n";
+        utils::showLine({11, 25}, {"Sales ID", "Name"});
+
+        for (Customer &customer : customers)
+        {
+            name = customer.getName();
+            utils::convertToLowerCase(name);
+            utils::convertToLowerCase(target_name);
+
+            if (name.find(target_name) != std::string::npos)
+            {
+                found = true;
+                utils::showLine({11, 25}, {std::to_string(customer.getSalesId()), customer.getName()});
+            }
+        }
+
+        if (!found)
+            utils::showMessage(MESSAGE_TYPE::INFO, "\nCustomer not found!\n");
+
+        std::cout << "\nDo you want to search another customer [y/n]? ";
+        std::getline(std::cin, choice);
+
+        if (choice != "y" && choice != "Y")
+            break;
+    }
 }
 
 // section :: shop
@@ -1069,7 +1234,7 @@ void ns_shop::menu()
 
         if (!response)
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "Could not fetch shop details!");
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "Couldn't fetch shop details!");
             utils::showMessage(MESSAGE_TYPE::INFO, "\n\nPress any key to go back...");
             utils::pauseScreen();
             return;

@@ -19,6 +19,7 @@ namespace app_files
     const std::string admin_file = "admin.csv";
     const std::string shop_file = "shop.csv";
     const std::string employees_file = "employees.csv";
+    const std::string customers_file = "customers.csv";
 
     const std::map<std::string, std::vector<std::string>> files = {
         {
@@ -32,6 +33,10 @@ namespace app_files
         {
             employees_file,
             {"ID", "Username", "Password", "First Name", "Middle Name", "Last Name", "Contact Number", "Added Date", "Removed Date", "Modified Date", "Status"},
+        },
+        {
+            customers_file,
+            {"Sales ID", "Name"}
         },
     };
 

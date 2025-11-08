@@ -104,6 +104,7 @@ void Employee::setId(int id)
 // setter :: set username
 void Employee::setUsername(std::string username)
 {
+    utils::convertToLowerCase(username);
     this->username = username;
 }
 
