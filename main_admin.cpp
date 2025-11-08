@@ -3,53 +3,77 @@
 #include <chrono>
 #include <vector>
 #include <string>
+#include <map>
+#include <unordered_map>
 
 // importing user-defined files
 #include "utils.h"
 #include "file_setup.h"
 #include "admin.h"
 #include "shop.h"
+#include "employee.h"
 
-// function declarations
-void menu(); // main menu
+// namespace :: inventory
+namespace ns_inventory
+{
+    void menu(); // inventory management menu
+}
 
-// section :: inventory
-void inventoryManagementMenu(); // inventory management menu
+// namespace :: employee
+namespace ns_employee
+{
+    void menu();             // menu
+    void viewAll();          // view all employees
+    void searchById();       // search employee by id
+    void searchByUsername(); // search employee by username
+    void add();              // add new employee
+    void update();           // update employee details
+    void remove();           // remove employee
+}
 
-// section :: employee
-void employeeManagementMenu(); // employee management menu
+// namespace :: customer
+namespace ns_customer
+{
+    void menu(); // customer management menu
+};
 
-// section :: customer
-void customerManagementMenu(); // customer management menu
+// namespace :: admin
+namespace ns_admin
+{
+    void menu();                // menu
+    bool registration();        // admin registration
+    bool login(Admin &);        // admin login
+    void profileMenu();         // profile menu
+    void updateUsername(Admin); // update username
+    void updatePassword(Admin); // update password
+    void updateName(Admin);     // update admin name
+};
 
-// section :: admin profile
-void myProfileMenu();       // my profile menu
-bool adminRegistration();   // admin registration
-bool adminLogin(Admin &);   // admin login
-void updateUsername(Admin); // update username
-void updatePassword(Admin); // update password
-void updateName(Admin);     // update admin name
+// namespace :: shop
+namespace ns_shop
+{
+    void menu();               // my shop menu
+    bool registration(Shop &); // register shop
+    void update(Shop &);       // update shop
+}
 
-// section :: shop
-void myShopMenu();             // my shop menu
-bool shopRegistration(Shop &); // register shop
-void updateShop(Shop &);       // update shop
-
-// main
+// main function
 int main()
 {
-    myShopMenu(); // temporary
-    return 0;     // temporary
-
+    // background :: file setup
     std::thread file_setup(app_files::setup); // file setup thread
-    file_setup.detach();                      // run file setup task in the background independently
+    file_setup.detach();
+
+    // background :: fetch employees
+    std::thread fetch_employees_thread(Employee::fetchAll);
+    fetch_employees_thread.detach();
 
     Admin admin;
 
     // check if admain has been registered yet
     if (!admin.isRegistered())
     {
-        if (adminRegistration())
+        if (ns_admin::registration())
         {
             utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nAdmin been registered successfully. Press any key to login.");
             utils::pauseScreen();
@@ -69,12 +93,12 @@ int main()
     {
         utils::clearScreen();
 
-        if (adminLogin(admin))
+        if (ns_admin::login(admin))
         {
             utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nLogin successful!");
             utils::showMessage(MESSAGE_TYPE::INFO, "\n\nRedirecting to main menu...");
             std::this_thread::sleep_for(std::chrono::seconds(1));
-            menu();
+            ns_admin::menu();
         }
         else
         {
@@ -110,7 +134,7 @@ int main()
 
     if (!shop.isRegistered())
     {
-        if (!shopRegistration(shop))
+        if (!ns_shop::registration(shop))
         {
             std::this_thread::sleep_for(std::chrono::seconds(2));
             exit(1);
@@ -120,8 +144,8 @@ int main()
     return 0;
 }
 
-// menu
-void menu()
+// section :: admin
+void ns_admin::menu()
 {
     std::string choice;
 
@@ -147,15 +171,15 @@ void menu()
         std::getline(std::cin, choice);
 
         if (choice == "1")
-            inventoryManagementMenu();
+            ns_inventory::menu();
         else if (choice == "2")
-            employeeManagementMenu();
+            ns_employee::menu();
         else if (choice == "3")
-            customerManagementMenu();
+            ns_customer::menu();
         else if (choice == "4")
-            myProfileMenu();
+            ns_admin::profileMenu();
         else if (choice == "5")
-            myShopMenu();
+            ns_shop::menu();
         else if (choice == "6")
         {
             utils::showMessage(MESSAGE_TYPE::INFO, "\nExiting program...\n");
@@ -170,77 +194,8 @@ void menu()
     }
 }
 
-// section :: inventory
-// inventory management menu
-void inventoryManagementMenu() {}
-
-// section :: employee
-// employee management menu
-void employeeManagementMenu() {}
-
-// section :: customer
-// customer management menu
-void customerManagementMenu() {}
-
-// section :: admin profile
-// admin registration
-bool adminRegistration()
-{
-    Admin admin;
-
-    std::string username, password, first_name, middle_name, last_name;
-
-    utils::header("ADMIN REGISTRATION");
-
-    utils::showMessage(MESSAGE_TYPE::INFO, "Admin has not been registered yet!");
-
-    std::cout << "\n\nUsername :: ";
-    std::getline(std::cin, username);
-    admin.setUsername(username);
-
-    std::cout << "\nPassword :: ";
-    std::getline(std::cin, password);
-    admin.setPassword(password);
-
-    std::cout << "\nFirst name :: ";
-    std::getline(std::cin, first_name);
-    admin.setFirstName(first_name);
-
-    std::cout << "\nMiddle name [Press enter if you don't have a middle name] :: ";
-    std::getline(std::cin, middle_name);
-    admin.setMiddleName(middle_name);
-
-    std::cout << "\nLast name :: ";
-    std::getline(std::cin, last_name);
-    admin.setLastName(last_name);
-
-    // show admin details
-    utils::header("ADMIN REGISTRATION DETAILS");
-    std::cout << "Username    :: " << admin.getUsername() << "\n\n";
-    std::cout << "Password    :: " << admin.getPassword() << "\n\n";
-    std::cout << "Name        :: " << admin.getFullName() << "\n";
-
-    return admin.registerAdmin();
-}
-
-// admin login
-bool adminLogin(Admin &admin)
-{
-    std::string username, password;
-
-    utils::header("ADMIN LOGIN");
-
-    std::cout << "Username :: ";
-    std::getline(std::cin, username);
-
-    std::cout << "\nPassword :: ";
-    std::getline(std::cin, password);
-
-    return admin.login(username, password);
-}
-
-// my profile menu
-void myProfileMenu()
+// admin :: profile menu
+void ns_admin::profileMenu()
 {
     bool response;
 
@@ -296,8 +251,64 @@ void myProfileMenu()
     }
 }
 
-// update username
-void updateUsername(Admin admin)
+// admin :: registration
+bool ns_admin::registration()
+{
+    Admin admin;
+
+    std::string username, password, first_name, middle_name, last_name;
+
+    utils::header("ADMIN REGISTRATION");
+
+    utils::showMessage(MESSAGE_TYPE::INFO, "Admin has not been registered yet!");
+
+    std::cout << "\n\nUsername :: ";
+    std::getline(std::cin, username);
+    admin.setUsername(username);
+
+    std::cout << "\nPassword :: ";
+    std::getline(std::cin, password);
+    admin.setPassword(password);
+
+    std::cout << "\nFirst name :: ";
+    std::getline(std::cin, first_name);
+    admin.setFirstName(first_name);
+
+    std::cout << "\nMiddle name [Press enter if you don't have a middle name] :: ";
+    std::getline(std::cin, middle_name);
+    admin.setMiddleName(middle_name);
+
+    std::cout << "\nLast name :: ";
+    std::getline(std::cin, last_name);
+    admin.setLastName(last_name);
+
+    // show admin details
+    utils::header("ADMIN REGISTRATION DETAILS");
+    std::cout << "Username    :: " << admin.getUsername() << "\n\n";
+    std::cout << "Password    :: " << admin.getPassword() << "\n\n";
+    std::cout << "Name        :: " << admin.getFullName() << "\n";
+
+    return admin.registerAdmin();
+}
+
+// admin :: login
+bool ns_admin::login(Admin &admin)
+{
+    std::string username, password;
+
+    utils::header("ADMIN LOGIN");
+
+    std::cout << "Username :: ";
+    std::getline(std::cin, username);
+
+    std::cout << "\nPassword :: ";
+    std::getline(std::cin, password);
+
+    return admin.login(username, password);
+}
+
+// admin :: update username
+void ns_admin::updateUsername(Admin admin)
 {
     std::string choice;
     std::string new_username;
@@ -344,8 +355,8 @@ void updateUsername(Admin admin)
     }
 }
 
-// update password
-void updatePassword(Admin admin)
+// admin :: update password
+void ns_admin::updatePassword(Admin admin)
 {
     std::string choice;
     std::string old_password, new_password, new_password_confirmation;
@@ -411,8 +422,8 @@ void updatePassword(Admin admin)
     }
 }
 
-// update name
-void updateName(Admin admin)
+// admin :: update name
+void ns_admin::updateName(Admin admin)
 {
     utils::clearScreen();
     utils::header("UPDATE NAME");
@@ -444,9 +455,602 @@ void updateName(Admin admin)
     utils::pauseScreen();
 }
 
-// section :: sop
-// my shop menu
-void myShopMenu()
+// section :: inventory
+// inventory :: menu
+void ns_inventory::menu()
+{
+    utils::header("INVENTORY MANAGEMENT MENU");
+    utils::pauseScreen();
+}
+
+// section :: employee
+// employee :: menu
+void ns_employee::menu()
+{
+    std::string choice;
+    const std::map<int, std::string> options = {
+        {1, "View Employeess"},
+        {2, "Search Employee By ID"},
+        {3, "Search Employee By Username"},
+        {4, "Add Employees"},
+        {5, "Update Employee Details"},
+        {6, "Remove Employee"},
+        {7, "Go Back"},
+    };
+
+    while (true)
+    {
+        utils::header("EMPLOYEE MANAGEMENT MENU");
+
+        for (const auto &options : options)
+            utils::showOption(options.first, options.second);
+
+        std::cout << "\nYour choice :: ";
+        std::getline(std::cin, choice);
+
+        if (choice == "1")
+            ns_employee::viewAll(); // view employees
+        else if (choice == "2")
+            ns_employee::searchById(); // search employee by id
+        else if (choice == "3")
+            ns_employee::searchByUsername(); // search employee by username
+        else if (choice == "4")
+            ns_employee::add(); // add employee
+        else if (choice == "5")
+            ns_employee::update(); // update
+        else if (choice == "6")
+            ns_employee::remove(); // remove employee
+        else if (choice == "7")
+            return;
+        else
+        {
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
+            utils::pauseScreen();
+        }
+    }
+}
+
+// employee :: view all employees
+void ns_employee::viewAll()
+{
+    utils::header("VIEW ALL EMPLOYEES");
+
+    if (Employee::LIST.size() == 0)
+    {
+        utils::showMessage(MESSAGE_TYPE::INFO, "No employees found!");
+        std::cout << "\n\nPress any key to go back...";
+        utils::pauseScreen();
+        return;
+    }
+
+    std::vector<int> spaces = {7, 22, 13, 12, 13, 12, 12, 16, 9};
+    utils::showLine(spaces, {"ID", "Name", "Username", "Password", "Contact No.", "Added On", "Removed On", "Last Modified", "Status"});
+
+    for (Employee &employee : Employee::LIST)
+        utils::showLine(spaces, {std::to_string(employee.getId()), employee.getFullName(), employee.getUsername(), employee.getPassword(), employee.getContactNumber(), utils::getDateString(employee.getAddedDate(), false), utils::getDateString(employee.getRemovedDate(), false), utils::getDateString(employee.getModifiedDate(), false), employee.getStatusString()});
+
+    std::cout << "\nPress any key to continue...";
+    utils::pauseScreen();
+}
+
+// employee :: search employee by id
+void ns_employee::searchById()
+{
+    int id;
+    bool found = false;
+    std::string id_str, choice;
+
+    while (true)
+    {
+        found = false;
+
+        utils::header("SEARCH EMPLOYEE BY ID");
+        std::cout << "Enter employee ID to search :: ";
+        std::getline(std::cin, id_str);
+
+        try
+        {
+            id = std::stoi(id_str);
+
+            for (Employee employee : Employee::LIST)
+            {
+                if (employee.getId() == id)
+                {
+                    found = true;
+                    std::cout << "\nUsername       :: " << employee.getUsername();
+                    std::cout << "\nPassword       :: " << employee.getPassword();
+                    std::cout << "\nName           :: " << employee.getFullName();
+                    std::cout << "\nContact Number :: " << employee.getContactNumber();
+                    std::cout << "\nAdded Date     :: " << utils::getDateString(employee.getAddedDate(), false);
+                    std::cout << "\nRemoved Date   :: " << utils::getDateString(employee.getRemovedDate(), false);
+                    std::cout << "\nModified Date  :: " << utils::getDateString(employee.getModifiedDate(), false);
+                    std::cout << "\nStatus         :: " << employee.getStatusString();
+                }
+            }
+
+            if (!found)
+                utils::showMessage(MESSAGE_TYPE::INFO, "\nNo employee found with this ID.");
+        }
+        catch (const std::invalid_argument &e)
+        {
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nPlease enter number input!");
+        }
+
+        std::cout << "\n\nDo you want to search another employee [y/n]? ";
+        std::getline(std::cin, choice);
+
+        if (choice != "y" && choice != "Y")
+            break;
+    }
+}
+
+// employee :: search employee by username
+void ns_employee::searchByUsername()
+{
+    bool found = false;
+    std::string username, choice;
+
+    while (true)
+    {
+        found = false;
+        utils::header("SEARCH EMPLOYEE BY USERNAME");
+        std::cout << "Enter username to search :: ";
+        std::getline(std::cin, username);
+
+        for (Employee employee : Employee::LIST)
+        {
+            if (employee.getUsername() == username)
+            {
+                found = true;
+                std::cout << "\nUsername       :: " << employee.getUsername();
+                std::cout << "\nPassword       :: " << employee.getPassword();
+                std::cout << "\nName           :: " << employee.getFullName();
+                std::cout << "\nContact Number :: " << employee.getContactNumber();
+                std::cout << "\nAdded Date     :: " << utils::getDateString(employee.getAddedDate(), false);
+                std::cout << "\nRemoved Date   :: " << utils::getDateString(employee.getRemovedDate(), false);
+                std::cout << "\nModified Date  :: " << utils::getDateString(employee.getModifiedDate(), false);
+                std::cout << "\nStatus         :: " << employee.getStatusString();
+            }
+        }
+
+        if (!found)
+            utils::showMessage(MESSAGE_TYPE::INFO, "\nNo employee found with this username.");
+
+        std::cout << "\n\nDo you want to search another employee [y/n]? ";
+        std::getline(std::cin, choice);
+
+        if (choice != "y" && choice != "Y")
+            break;
+    }
+}
+
+// employee :: add new employee
+void ns_employee::add()
+{
+    Employee employee;
+
+    bool valid_username;
+    std::string choice;
+    std::string username, password;
+    std::string first_name, middle_name, last_name;
+    std::string contact_number;
+
+    while (true)
+    {
+        valid_username = true;
+
+        utils::header("ADD NEW EMPLOYEE");
+        std::cout << "Username          :: ";
+        std::getline(std::cin, username);
+
+        for (Employee temp_employee : Employee::LIST)
+        {
+            if (temp_employee.getUsername() == username)
+            {
+                valid_username = false;
+                break;
+            }
+        }
+
+        if (valid_username)
+            break;
+        else
+        {
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nThis username is already take!");
+            std::cout << "\n\nDo you want to try again [y/n]? ";
+            std::getline(std::cin, choice);
+
+            if (choice != "Y" && choice != "y")
+                return;
+        }
+    }
+    employee.setUsername(username);
+
+    std::cout << "\nPassword          :: ";
+    std::getline(std::cin, password);
+    employee.setPassword(password);
+
+    std::cout << "\nFirst Name        :: ";
+    std::getline(std::cin, first_name);
+    employee.setFirstName(first_name);
+
+    std::cout << "\nMiddle Name [Press enter if not available]    :: ";
+    std::getline(std::cin, middle_name);
+    employee.setMiddleName(middle_name);
+
+    std::cout << "\nLast Name         :: ";
+    std::getline(std::cin, last_name);
+    employee.setLastName(last_name);
+
+    std::cout << "\nContact Number    :: ";
+    std::getline(std::cin, contact_number);
+    employee.setContactNumber(contact_number);
+
+    employee.setStatus(EMPLOYEE_STATUS::ACTIVE);
+    employee.setAddedDate(utils::getCurrentDateTime());
+
+    // show employee details
+    utils::header("ADD NEW EMPLOYEE");
+    std::cout << "Username          :: " << employee.getUsername() << "\n";
+    std::cout << "Password          :: " << employee.getPassword() << "\n";
+    std::cout << "Name              :: " << employee.getFullName() << "\n";
+    std::cout << "Contact Number    :: " << employee.getContactNumber() << "\n";
+    std::cout << "Added Date        :: " << utils::getDateString(employee.getAddedDate(), false) << "\n";
+    std::cout << "Status            :: " << employee.getStatusString() << "\n";
+
+    // ask user to proceed
+    std::cout << "\nAre you sure you want to add [y/n]? ";
+    std::getline(std::cin, choice);
+
+    if (choice != "Y" && choice != "y")
+        utils::showMessage(MESSAGE_TYPE::INFO, "\nEmployee addition cancelled.");
+    else
+    {
+        if (employee.add())
+        {
+            utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nEmployee added successfully!");
+            std::thread fetch_employees_thread(Employee::fetchAll);
+            fetch_employees_thread.detach();
+        }
+        else
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nEmployee addition failed!");
+    }
+
+    std::cout << "\n\nPress any key to continue...";
+    utils::pauseScreen();
+}
+
+// employee :: update employee details
+void ns_employee::update()
+{
+    int id;
+    bool id_found;
+
+    std::string id_str, choice;
+    Employee employee;
+
+    while (true)
+    {
+        utils::header("UPDATE EMPLOYEE DETAILS");
+
+        std::cout << "Enter employee ID to update :: ";
+        std::getline(std::cin, id_str);
+
+        try
+        {
+            id = std::stoi(id_str);
+
+            // check for id presence
+            id_found = false;
+            for (Employee temp : Employee::LIST)
+                if (temp.getId() == id)
+                {
+                    id_found = true;
+                    employee = temp;
+                    break;
+                }
+
+            if (id_found)
+                break;
+            else
+            {
+                utils::showMessage(MESSAGE_TYPE::FAILURE, "\nNo employee found with this ID!");
+
+                // try again
+                std::cout << "\n\nDo you want to try again [y/n]? ";
+                std::getline(std::cin, choice);
+
+                if (choice != "Y" && choice != "y")
+                    return;
+
+                continue;
+            }
+
+            std::cout << "\nID found :: " << std::boolalpha << id_found;
+
+            utils::pauseScreen();
+        }
+        catch (const std::invalid_argument &e)
+        {
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid input!");
+
+            std::cout << "\n\nDo you want to try again [y/n]? ";
+            std::getline(std::cin, choice);
+
+            if (choice != "Y" && choice != "y")
+                return;
+
+            continue;
+        }
+    }
+
+    // update logics starts from here
+    utils::header("UPDATE EMPLOYEE DETAILS");
+
+    // initial details
+    std::cout << "INITIAL DETAILS";
+    std::cout << "\n\nUsername       :: " << employee.getUsername();
+    std::cout << "\nPassword       :: " << employee.getPassword();
+    std::cout << "\nName           :: " << employee.getFullName();
+    std::cout << "\nContact Number :: " << employee.getContactNumber();
+    std::cout << "\nAdded on       :: " << utils::getDateString(employee.getAddedDate(), false);
+    std::cout << "\nRemoved on     :: " << utils::getDateString(employee.getModifiedDate(), false);
+    std::cout << "\nLast modified  :: " << utils::getDateString(employee.getRemovedDate(), false);
+    std::cout << "\nStatus         :: " << employee.getStatusString();
+
+    std::cout << "\n\nYou can press enter if you don't want to update the specific details...";
+
+    // get new details
+    bool valid_username;
+    bool detail_modified = false;
+    std::string username, password, first_name, middle_name, last_name, contact_number;
+
+    // gettting username
+    while (true)
+    {
+        valid_username = true;
+
+        std::cout << "\n\nUsername       :: ";
+        std::getline(std::cin, username);
+
+        if (username.empty())
+            break;
+
+        for (Employee temp : Employee::LIST)
+        {
+            if (temp.getUsername() == username)
+            {
+                valid_username = false;
+                break;
+            }
+        }
+
+        if (valid_username)
+        {
+            employee.setUsername(username);
+            detail_modified = true;
+            break;
+        }
+        else
+        {
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nThis username is already taken!");
+
+            std::cout << "\n\nDo you want to try again [y/n]? ";
+            std::getline(std::cin, choice);
+
+            if (choice != "Y" && choice != "y")
+                return;
+        }
+    }
+
+    // getting password
+    std::cout << "\nPassword       :: ";
+    std::getline(std::cin, password);
+
+    if (!password.empty())
+    {
+        employee.setPassword(password);
+        detail_modified = true;
+    }
+
+    // getting first name
+    std::cout << "\nFirst name     :: ";
+    std::getline(std::cin, first_name);
+
+    if (!first_name.empty())
+    {
+        employee.setFirstName(first_name);
+        detail_modified = true;
+    }
+
+    // getting middle name
+    std::cout << "\nMiddle name    :: ";
+    std::getline(std::cin, middle_name);
+
+    if (!middle_name.empty())
+    {
+        employee.setMiddleName(middle_name);
+        detail_modified = true;
+    }
+
+    // getting last name
+    std::cout << "\nLast name      :: ";
+    std::getline(std::cin, last_name);
+
+    if (!last_name.empty())
+    {
+        employee.setLastName(last_name);
+        detail_modified = true;
+    }
+
+    // getting contact number
+    std::cout << "\nContact number :: ";
+    std::getline(std::cin, contact_number);
+
+    if (!contact_number.empty())
+    {
+        employee.setContactNumber(contact_number);
+        detail_modified = true;
+    }
+
+    if (!detail_modified)
+    {
+        utils::showMessage(MESSAGE_TYPE::INFO, "\nNothing to update!");
+        std::cout << "\n\nPress any key to go back...";
+        utils::pauseScreen();
+        return;
+    }
+
+    // display new details
+    utils::header("UPDATE EMPLOYEE DETAILS");
+    std::cout << "NEW DETAILS";
+    std::cout << "\n\nUsername       :: " << employee.getUsername();
+    std::cout << "\nPassword       :: " << employee.getPassword();
+    std::cout << "\nName           :: " << employee.getFullName();
+    std::cout << "\nContact Number :: " << employee.getContactNumber();
+
+    std::cout << "\n\nAre your sure you want to update [y/n]? ";
+    std::getline(std::cin, choice);
+
+    if (choice != "Y" && choice != "y")
+    {
+        utils::showMessage(MESSAGE_TYPE::INFO, "\nEmployee updation cancelled!");
+        std::cout << "\n\nPress any key to continue...";
+        utils::pauseScreen();
+        return;
+    }
+
+    employee.setModifiedDate(utils::getCurrentDateTime()); // update modified date
+
+    bool response = employee.update();
+
+    if (response)
+    {
+        // background :: fetch employees
+        std::thread fetch_employees_thread(Employee::fetchAll);
+        fetch_employees_thread.detach();
+
+        utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nEmployee updated successfully!");
+    }
+    else
+        utils::showMessage(MESSAGE_TYPE::FAILURE, "\nEmployee updation failed!");
+
+    std::cout << "\n\nPress any key to continue...";
+    utils::pauseScreen();
+}
+
+// employee :: remove employee
+void ns_employee::remove()
+{
+    int id;
+    bool id_found, valid_id, already_removed;
+    std::string id_str, choice;
+    Employee employee;
+
+    while (true)
+    {
+        valid_id = false;
+        id_found = false;
+        already_removed = false;
+
+        utils::header("REMOVE EMPLOYEE");
+
+        std::cout << "Enter employee ID to remove :: ";
+        std::getline(std::cin, id_str);
+
+        // employee id validity test
+        try
+        {
+            id = std::stoi(id_str);
+            valid_id = true;
+        }
+        catch (const std::invalid_argument &e)
+        {
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid input!");
+        }
+
+        if (valid_id) // valid employee id
+        {
+            // check the presence of id
+            for (Employee temp : Employee::LIST)
+            {
+                if (temp.getId() == id)
+                {
+                    employee = temp;
+
+                    id_found = true;
+
+                    if (temp.getStatus() == EMPLOYEE_STATUS::INACTIVE)
+                        already_removed = true;
+
+                    break;
+                }
+            }
+
+            if (!id_found)
+            {
+                utils::showMessage(MESSAGE_TYPE::INFO, "\nEmployee with this ID not found!");
+            }
+            else
+            {
+                // preview employee details
+                std::cout << "\nEMPLOYEE DETAILS";
+                std::cout << "\n\nUsername        :: " << employee.getUsername();
+                std::cout << "\nName            :: " << employee.getFullName();
+                std::cout << "\nContact Number  :: " << employee.getContactNumber();
+                std::cout << "\nAdded On        :: " << utils::getDateString(employee.getAddedDate(), false);
+                std::cout << "\nRemoved On      :: " << utils::getDateString(employee.getRemovedDate(), false);
+                std::cout << "\nLast Modified   :: " << utils::getDateString(employee.getModifiedDate(), false);
+                std::cout << "\nStatus          :: " << employee.getStatusString();
+
+                // check if employee is already removed
+                if (already_removed)
+                    utils::showMessage(MESSAGE_TYPE::INFO, "\n\nThis employee is already removed!");
+                else
+                {
+                    std::cout << "\n\nAre you sure you want to remove this employee [y/n]? ";
+                    std::getline(std::cin, choice);
+
+                    if (choice != "y" && choice != "Y")
+                        utils::showMessage(MESSAGE_TYPE::INFO, "\nEmployee removal cancelled!");
+                    else
+                    {
+                        // remove employee
+                        if (Employee::remove(id))
+                        {
+                            utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nEmployee removed successfully!");
+
+                            // background :: update employee list
+                            std::thread fetch_employees_thread(Employee::fetchAll);
+                            fetch_employees_thread.detach();
+                        }
+                        else
+                            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nCouldn't remove employee!");
+                    }
+                }
+            }
+        }
+
+        std::cout << "\n\nDo you want to remove another employee [y/n]? ";
+        std::getline(std::cin, choice);
+
+        if (choice != "y" && choice != "Y")
+            return;
+    }
+}
+
+// section :: customer
+// customer :: menu
+void ns_customer::menu()
+{
+    utils::header("CUSTOMER MANAGEMENT MENU");
+
+    utils::pauseScreen();
+}
+
+// section :: shop
+// shop :: menu
+void ns_shop::menu()
 {
     Shop shop;
     bool response;
@@ -484,7 +1088,7 @@ void myShopMenu()
         std::getline(std::cin, choice);
 
         if (choice == "1")
-            updateShop(shop);
+            ns_shop::update(shop);
         else if (choice == "2")
             return;
         else
@@ -495,8 +1099,8 @@ void myShopMenu()
     }
 }
 
-// register shop
-bool shopRegistration(Shop &shop)
+// shop :: registration
+bool ns_shop::registration(Shop &shop)
 {
     bool status = false;
 
@@ -590,8 +1194,8 @@ bool shopRegistration(Shop &shop)
     return status;
 }
 
-// update shop
-void updateShop(Shop &shop)
+// shop :: update
+void ns_shop::update(Shop &shop)
 {
     int ward;
     bool details_changed = false;

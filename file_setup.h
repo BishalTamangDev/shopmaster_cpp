@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -28,10 +29,15 @@ namespace app_files
             shop_file,
             {"Name", "PAN", "Contact Number", "Currency", "District", "Municipality", "Tole/Village", "Ward"},
         },
+        {
+            employees_file,
+            {"ID", "Username", "Password", "First Name", "Middle Name", "Last Name", "Contact Number", "Added Date", "Removed Date", "Modified Date", "Status"},
+        },
     };
 
     void setup();                                              // setup files
     void createNewFile(std::string, std::vector<std::string>); // create new file
+    bool updateFile(std::string, std::string);                 // updating file
 }
 
 // setup files :: check for the presence of files
@@ -82,6 +88,21 @@ void app_files::createNewFile(std::string filename, std::vector<std::string> tit
 
     fout << "\n";
     fout.close();
+}
+
+// update file :: delete and rename
+bool app_files::updateFile(std::string old_file, std::string new_file)
+{
+    try
+    {
+        std::filesystem::remove(old_file);
+        std::filesystem::rename(new_file, old_file);
+        return true;
+    }
+    catch (std::filesystem::filesystem_error &e)
+    {
+        return false;
+    }
 }
 
 #endif
