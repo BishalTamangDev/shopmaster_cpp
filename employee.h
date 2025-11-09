@@ -81,10 +81,10 @@ public:
 
     int getStatusInteger(EMPLOYEE_STATUS);
 
-    bool add();                           // add new employee
-    bool login(std::string, std::string); // login
-    bool fetch(int id);                   // fetch employee details
-    bool update();                        // update
+    bool add();                                  // add new employee
+    bool login(std::string, std::string, int &); // login
+    bool fetch(int id);                          // fetch employee details
+    bool update();                               // update
 
     // static variables & functions
     static bool remove(int id); // remove
@@ -385,19 +385,23 @@ bool Employee::add()
 }
 
 // login
-bool Employee::login(std::string username, std::string password)
+bool Employee::login(std::string username, std::string password, int &current_emp_id)
 {
-    // std::string username, password;
+    bool status = false;
 
-    // utils::header("EMPLOYEE LOGIN");
+    Employee::fetchAll(); // update employee list
 
-    // std::cout << "Username :: ";
-    // std::getline(std::cin, username);
+    for (Employee employee : Employee::LIST)
+    {
+        if (employee.getUsername() == username && employee.getPassword() == password)
+        {
+            current_emp_id = employee.getId();
+            status = true;
+            break;
+        }
+    }
 
-    // std::cout << "\nPassword :: ";
-    // std::getline(std::cin, password);
-
-    return username == this->username && password == this->password;
+    return status;
 }
 
 // fetch employee details
