@@ -15,29 +15,29 @@
 // app files
 namespace app_files
 {
-    // files
-    const std::string admin_file = "admin.csv";
-    const std::string shop_file = "shop.csv";
-    const std::string employees_file = "employees.csv";
-    const std::string customers_file = "customers.csv";
+    // filenames
+    std::map<std::string, std::string> filenames = {
+        {"admin", "admin.csv"},
+        {"shop", "shop.csv"},
+        {"employee", "employees.csv"},
+        {"customer", "customers.csv"},
+    };
 
     const std::map<std::string, std::vector<std::string>> files = {
         {
-            admin_file,                                                         // file
+            filenames["admin"],                                                 // file
             {"Username", "Password", "First Name", "Middle Name", "Last Name"}, // heading titles
         },
         {
-            shop_file,
+            filenames["shop"],
             {"Name", "PAN", "Contact Number", "Currency", "District", "Municipality", "Tole/Village", "Ward"},
         },
         {
-            employees_file,
+            filenames["employee"],
             {"ID", "Username", "Password", "First Name", "Middle Name", "Last Name", "Contact Number", "Added Date", "Removed Date", "Modified Date", "Status"},
         },
-        {
-            customers_file,
-            {"Sales ID", "Name"}
-        },
+        {filenames["customer"],
+         {"Sales ID", "Name"}},
     };
 
     void setup();                                              // setup files

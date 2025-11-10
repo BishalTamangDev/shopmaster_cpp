@@ -85,6 +85,7 @@ public:
     bool login(std::string, std::string, int &); // login
     bool fetch(int id);                          // fetch employee details
     bool update();                               // update
+    void show(bool);                                 // show employee details
 
     // static variables & functions
     static bool remove(int id); // remove
@@ -351,7 +352,7 @@ bool Employee::add()
     Employee temp_employee;
 
     // open file and get latest id + 1
-    file.open(app_files::employees_file, std::ios::in); // open file in append mode
+    file.open(app_files::filenames["employee"], std::ios::in); // open file in append mode
     std::getline(file, headline);                       // get headline
 
     // get valid id
@@ -365,7 +366,7 @@ bool Employee::add()
     this->setId(valid_id); // set new valid id
 
     // add process
-    file.open(app_files::employees_file, std::ios::app); // open file in append mode
+    file.open(app_files::filenames["employee"], std::ios::app); // open file in append mode
 
     file
         << this->id << ","
@@ -441,7 +442,7 @@ void Employee::fetchAll()
     std::vector<Employee> employees;
     std::vector<std::any> line_data;
 
-    std::ifstream file(app_files::employees_file);
+    std::ifstream file(app_files::filenames["employee"]);
 
     std::getline(file, line); // heading
 
@@ -462,7 +463,7 @@ bool Employee::update()
     std::string heading;
 
     // open file and get headline
-    std::fstream file(app_files::employees_file, std::ios::in);
+    std::fstream file(app_files::filenames["employee"], std::ios::in);
     std::getline(file, heading);
     file.close();
 
@@ -505,7 +506,22 @@ bool Employee::update()
     }
     file.close();
 
-    return app_files::updateFile(app_files::employees_file, "new_employee.csv");
+    return app_files::updateFile(app_files::filenames["employee"], "new_employee.csv");
+}
+
+// show employee details
+void Employee::show(bool adding)
+{
+    if(!adding)
+        std::cout << "ID               :: " << this->getId() << "\n";
+    std::cout << "Username         :: " << this->getUsername();
+    std::cout << "\nPassword         :: " << this->getPassword();
+    std::cout << "\nName             :: " << this->getFullName();
+    std::cout << "\nContact Number   :: " << this->getContactNumber();
+    std::cout << "\nJoined Date      :: " << utils::getDateString(this->getAddedDate(), false);
+    std::cout << "\nRemoved Date     :: " << utils::getDateString(this->getRemovedDate(), false);
+    std::cout << "\nLast Modified    :: " << utils::getDateString(this->getModifiedDate(), false);
+    std::cout << "\nStatus           :: " << this->getStatusString();
 }
 
 // remove
@@ -515,7 +531,7 @@ bool Employee::remove(int target_id)
     std::string heading;
 
     // open file and get headline
-    file.open(app_files::employees_file, std::ios::in);
+    file.open(app_files::filenames["employee"], std::ios::in);
     std::getline(file, heading);
     file.close();
 
@@ -547,7 +563,7 @@ bool Employee::remove(int target_id)
 
     file.close();
 
-    return app_files::updateFile(app_files::employees_file, "new_employees.csv");
+    return app_files::updateFile(app_files::filenames["employee"], "new_employees.csv");
 }
 
 #endif

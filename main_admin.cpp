@@ -561,14 +561,7 @@ void ns_employee::searchById()
                 if (employee.getId() == id)
                 {
                     found = true;
-                    std::cout << "\nUsername       :: " << employee.getUsername();
-                    std::cout << "\nPassword       :: " << employee.getPassword();
-                    std::cout << "\nName           :: " << employee.getFullName();
-                    std::cout << "\nContact Number :: " << employee.getContactNumber();
-                    std::cout << "\nAdded Date     :: " << utils::getDateString(employee.getAddedDate(), false);
-                    std::cout << "\nRemoved Date   :: " << utils::getDateString(employee.getRemovedDate(), false);
-                    std::cout << "\nModified Date  :: " << utils::getDateString(employee.getModifiedDate(), false);
-                    std::cout << "\nStatus         :: " << employee.getStatusString();
+                    employee.show(false);
                 }
             }
 
@@ -606,14 +599,7 @@ void ns_employee::searchByUsername()
             if (employee.getUsername() == username)
             {
                 found = true;
-                std::cout << "\nUsername       :: " << employee.getUsername();
-                std::cout << "\nPassword       :: " << employee.getPassword();
-                std::cout << "\nName           :: " << employee.getFullName();
-                std::cout << "\nContact Number :: " << employee.getContactNumber();
-                std::cout << "\nAdded Date     :: " << utils::getDateString(employee.getAddedDate(), false);
-                std::cout << "\nRemoved Date   :: " << utils::getDateString(employee.getRemovedDate(), false);
-                std::cout << "\nModified Date  :: " << utils::getDateString(employee.getModifiedDate(), false);
-                std::cout << "\nStatus         :: " << employee.getStatusString();
+                employee.show(false);
             }
         }
 

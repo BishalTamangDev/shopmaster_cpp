@@ -158,7 +158,7 @@ std::string Admin::getFullName()
 // register
 bool Admin::registerAdmin()
 {
-    std::ofstream file(app_files::admin_file, std::ios::app);
+    std::ofstream file(app_files::filenames["admin"], std::ios::app);
     file << this->username << "," << this->password << "," << this->first_name << "," << this->middle_name << "," << this->last_name << "\n";
     file.close();
 
@@ -176,7 +176,7 @@ bool Admin::isRegistered()
 {
     std::string line;
     std::vector<std::any> data;
-    std::ifstream file(app_files::admin_file);
+    std::ifstream file(app_files::filenames["admin"]);
 
     std::getline(file, line); // healine
     std::getline(file, line);
@@ -198,7 +198,7 @@ bool Admin::isRegistered()
 // fetch admin details
 bool Admin::fetch()
 {
-    std::ifstream file(app_files::admin_file);
+    std::ifstream file(app_files::filenames["admin"]);
 
     std::string line;
 
@@ -217,12 +217,12 @@ bool Admin::update()
     std::string heading;
 
     // open file and get headline
-    std::fstream file(app_files::admin_file, std::ios::in);
+    std::fstream file(app_files::filenames["admin"], std::ios::in);
     std::getline(file, heading);
     file.close();
 
     // open file and update line
-    file.open(app_files::admin_file, std::ios::out);
+    file.open(app_files::filenames["admin"], std::ios::out);
 
     file << heading << "\n"; // write heading
     file << this->username << "," << this->password << "," << this->first_name << "," << this->middle_name << "," << this->last_name << "\n";

@@ -219,7 +219,7 @@ bool Shop::isRegistered()
 {
     std::string line;
     std::vector<std::any> data;
-    std::ifstream file(app_files::shop_file);
+    std::ifstream file(app_files::filenames["shop"]);
 
     std::getline(file, line); // healine
     std::getline(file, line); // get shop details
@@ -231,7 +231,7 @@ bool Shop::isRegistered()
 // register shop
 bool Shop::registerShop()
 {
-    std::ofstream file(app_files::shop_file, std::ios::app);
+    std::ofstream file(app_files::filenames["shop"], std::ios::app);
 
     file << this->name << "," << this->pan << "," << this->contact_number << "," << this->currency << "," << this->district << "," << this->municipality << "," << this->tole_village << "," << this->ward << "\n";
 
@@ -245,7 +245,7 @@ bool Shop::fetch()
 {
     std::string line;
 
-    std::ifstream file(app_files::shop_file);
+    std::ifstream file(app_files::filenames["shop"]);
 
     std::getline(file, line); // heading
     std::getline(file, line); // shop details
@@ -268,12 +268,12 @@ bool Shop::update()
     std::string headline;
 
     // open shop file and get headline
-    file.open(app_files::shop_file, std::ios::in);
+    file.open(app_files::filenames["shop"], std::ios::in);
     std::getline(file, headline); // get headline
     file.close();
 
     // write new data
-    file.open(app_files::shop_file, std::ios::out);
+    file.open(app_files::filenames["shop"], std::ios::out);
     file << headline << "\n";
     file << this->name << "," << this->pan << "," << this->contact_number << "," << this->currency << "," << this->district << "," << this->municipality << "," << this->tole_village << "," << this->ward << "\n";
 

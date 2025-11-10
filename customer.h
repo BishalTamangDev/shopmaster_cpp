@@ -73,7 +73,7 @@ std::string Customer::getName()
 bool Customer::add()
 {
     // get headline
-    std::ofstream file(app_files::customers_file, std::ios::app);
+    std::ofstream file(app_files::filenames["customer"], std::ios::app);
 
     file << this->getSalesId() << "," << this->getName() << "\n";
 
@@ -107,7 +107,7 @@ std::vector<Customer> Customer::fetchAll()
     Customer customer;
     std::vector<Customer> customers;
 
-    std::ifstream fin(app_files::customers_file);
+    std::ifstream fin(app_files::filenames["customer"]);
 
     std::getline(fin, line);
 

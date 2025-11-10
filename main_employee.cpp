@@ -162,7 +162,19 @@ bool ns_employee::menu()
 // employee :: show details
 void ns_employee::showDetails()
 {
+    Employee employee;
+
+    bool response = employee.fetch(current_emp_id);
+
     utils::header("MY ACCOUNT DETAILS");
+
+    if (!response)
+        utils::showMessage(MESSAGE_TYPE::FAILURE, "Couldn't fetch employee details!");
+    else
+        employee.show(false);
+
+    std::cout << "\n\nPress any key to continue...";
+
     utils::pauseScreen();
 }
 
