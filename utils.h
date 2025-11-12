@@ -62,7 +62,6 @@ namespace utils
     std::array<int, 6> getCurrentDateTime();                   // get current date & time
 }
 
-
 // function definitions
 // clear screen
 void utils::clearScreen()
@@ -184,12 +183,24 @@ std::string utils::getDateString(std::array<int, 6> date, bool adding)
     if (date[0] == 0)
         return adding ? "" : "-";
     else
-        return std::to_string(date[0]) + "-" + std::to_string(date[1]) + "-" + std::to_string(date[2]);
+    {
+        std::string date_string = "";
+        date_string.append(std::to_string(date[0]));
+        date[1] < 10 ? date_string.append("-0") : date_string.append("-");
+        date_string.append(std::to_string(date[1]));
+        date[1] < 10 ? date_string.append("-0") : date_string.append("-");
+        date_string.append(std::to_string(date[2]));
+
+        return date_string;
+    }
 }
 
 // get date from string
 std::array<int, 6> utils::getDateFromString(std::string str)
 {
+    if (str == "")
+        return {0, 0, 0, 0, 0, 0};
+
     std::string cell;
     std::array<int, 6> date = {0, 0, 0, 0, 0, 0};
 

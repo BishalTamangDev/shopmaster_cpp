@@ -1,3 +1,4 @@
+// import header files
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -21,12 +22,14 @@ namespace app_files
         {"shop", "shop.csv"},
         {"employee", "employees.csv"},
         {"customer", "customers.csv"},
+        {"product", "products.csv"},
     };
 
-    const std::map<std::string, std::vector<std::string>> files = {
+    // headlines
+    std::map<std::string, std::vector<std::string>> headlines = {
         {
-            filenames["admin"],                                                 // file
-            {"Username", "Password", "First Name", "Middle Name", "Last Name"}, // heading titles
+            filenames["admin"],               // file
+            {"Username", "Password", "Name"}, // heading titles
         },
         {
             filenames["shop"],
@@ -34,10 +37,14 @@ namespace app_files
         },
         {
             filenames["employee"],
-            {"ID", "Username", "Password", "First Name", "Middle Name", "Last Name", "Contact Number", "Added Date", "Removed Date", "Modified Date", "Status"},
+            {"ID", "Username", "Password", "Name", "Contact Number", "Added Date", "Removed Date", "Last Modified", "Status"},
         },
-        {filenames["customer"],
-         {"Sales ID", "Name"}},
+        {
+            filenames["customer"],
+            {"Sales ID", "Name"},
+        },
+        {filenames["product"],
+         {"ID", "Name", "Rate", "Quantity", "Added On", "Removed On", "Last Modified", "Status"}},
     };
 
     void setup();                                              // setup files
@@ -55,15 +62,15 @@ void app_files::setup()
     std::vector<std::string> required_heading_titles = {};
     std::vector<std::string> actual_heading_titles = {};
 
-    for (const auto &file : files)
+    for (const auto &headline : headlines)
     {
-        required_heading_titles = file.second; // get heading titles
+        required_heading_titles = headline.second; // get heading titles
         actual_heading_titles.clear();         // clear actual heading titles
 
-        fin.open(file.first);
+        fin.open(headline.first);
 
         if (!fin.is_open()) // file not found
-            createNewFile(file.first, required_heading_titles);
+            createNewFile(headline.first, required_heading_titles);
         else
         {
             std::getline(fin, line); // get a line
@@ -74,7 +81,7 @@ void app_files::setup()
                 actual_heading_titles.push_back(cell);
 
             if (required_heading_titles != actual_heading_titles)
-                createNewFile(file.first, required_heading_titles); //  create new file
+                createNewFile(headline.first, required_heading_titles); //  create new file
         }
     }
 }

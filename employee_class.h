@@ -12,26 +12,26 @@
 #ifndef SHOPMASTER_EMPLOYEE_H
 #define SHOPMASTER_EMPLOYEE_H
 
+// employee status enum
 enum class EMPLOYEE_STATUS
 {
     INACTIVE = 0,
     ACTIVE = 1,
 };
 
+// class :: Employee
 class Employee
 {
 private:
     int id;
     std::string username;
     std::string password;
-    std::string first_name;
-    std::string middle_name;
-    std::string last_name;
+    std::string name;
     std::string contact_number;
     EMPLOYEE_STATUS status;
     std::array<int, 6> added_date = {0, 0, 0};
     std::array<int, 6> removed_date = {0, 0, 0};
-    std::array<int, 6> modified_date = {0, 0, 0};
+    std::array<int, 6> last_modified = {0, 0, 0};
 
 public:
     Employee() // constructor
@@ -39,23 +39,19 @@ public:
         this->id = 0;
         this->username = "";
         this->password = "";
-        this->first_name = "";
-        this->middle_name = "";
-        this->last_name = "";
+        this->name = "";
         this->contact_number = "";
         this->status = EMPLOYEE_STATUS::INACTIVE;
         this->added_date = {0, 0, 0};
         this->removed_date = {0, 0, 0};
-        this->modified_date = {0, 0, 0};
+        this->last_modified = {0, 0, 0};
     }
 
     // setters
     void setId(int);
     void setUsername(std::string);
     void setPassword(std::string);
-    void setFirstName(std::string);
-    void setMiddleName(std::string);
-    void setLastName(std::string);
+    void setName(std::string);
     void setContactNumber(std::string);
     void setStatus(EMPLOYEE_STATUS);
     void setStatusByString(std::string);
@@ -65,30 +61,26 @@ public:
     bool setByLineData(std::vector<std::any>); // set admin using line data
 
     // getters
-    int getId();
+    int getId() const;
     std::string getUsername();
-    std::string getPassword();
-    std::string getFirstName();
-    std::string getMiddleName();
-    std::string getLastName();
-    std::string getFullName();
+    std::string getPassword() const;
+    std::string getName();
     std::string getContactNumber();
-    EMPLOYEE_STATUS getStatus();
-    std::string getStatusString();
-    std::array<int, 6> getAddedDate();
-    std::array<int, 6> getRemovedDate();
-    std::array<int, 6> getModifiedDate();
+    EMPLOYEE_STATUS getStatus() const;
+    std::string getStatusString() const;
+    std::array<int, 6> getAddedDate() const;
+    std::array<int, 6> getRemovedDate() const;
+    std::array<int, 6> getLastModified() const;
 
-    int getStatusInteger(EMPLOYEE_STATUS);
+    int getStatusInteger(EMPLOYEE_STATUS) const;
 
     bool add();                                  // add new employee
     bool login(std::string, std::string, int &); // login
     bool fetch(int id);                          // fetch employee details
     bool update();                               // update
-    void show(bool);                                 // show employee details
+    void show(bool);                             // show employee details
 
     // static variables & functions
-    static bool remove(int id); // remove
     static std::vector<Employee> LIST;
     static void fetchAll(); // fetch employee details
 };
@@ -115,34 +107,20 @@ void Employee::setPassword(std::string password)
     this->password = password;
 }
 
-// setter :: first name
-void Employee::setFirstName(std::string first_name)
+// setter :: name
+void Employee::setName(std::string name)
 {
-    utils::convertToWordCase(first_name);
-    this->first_name = first_name;
+    utils::convertToWordCase(name);
+    this->name = name;
 }
 
-// setter :: middle name
-void Employee::setMiddleName(std::string middle_name)
-{
-    utils::convertToWordCase(middle_name);
-    this->middle_name = middle_name;
-}
-
-// setter :: last name
-void Employee::setLastName(std::string last_name)
-{
-    utils::convertToWordCase(last_name);
-    this->last_name = last_name;
-}
-
-// setter :: last name
+// setter :: contact number
 void Employee::setContactNumber(std::string contact_number)
 {
     this->contact_number = contact_number;
 }
 
-// setter :: last name
+// setter :: status
 void Employee::setStatus(EMPLOYEE_STATUS status)
 {
     this->status = status;
@@ -174,7 +152,7 @@ void Employee::setRemovedDate(std::array<int, 6> date)
 // setter :: modified date
 void Employee::setModifiedDate(std::array<int, 6> date)
 {
-    this->modified_date = date;
+    this->last_modified = date;
 }
 
 // set admin using line data
@@ -185,17 +163,13 @@ bool Employee::setByLineData(std::vector<std::any> data)
         this->id = std::stoi(std::any_cast<std::string>(data[0]));
         this->username = std::any_cast<std::string>(data[1]);
         this->password = std::any_cast<std::string>(data[2]);
-
-        this->setFirstName(std::any_cast<std::string>(data[3]));
-        this->setMiddleName(std::any_cast<std::string>(data[4]));
-        this->setLastName(std::any_cast<std::string>(data[5]));
-
-        this->contact_number = std::any_cast<std::string>(data[6]);
+        this->setName(std::any_cast<std::string>(data[3]));
+        this->contact_number = std::any_cast<std::string>(data[4]);
 
         std::string date_string;
 
         // added date
-        date_string = std::any_cast<std::string>(data[7]);
+        date_string = std::any_cast<std::string>(data[5]);
         if (date_string.empty())
             this->setAddedDate({0, 0, 0, 0, 0, 0});
         else
@@ -205,7 +179,7 @@ bool Employee::setByLineData(std::vector<std::any> data)
         }
 
         // removed date
-        date_string = std::any_cast<std::string>(data[8]);
+        date_string = std::any_cast<std::string>(data[6]);
         if (date_string.empty())
             this->setRemovedDate({0, 0, 0, 0, 0, 0});
         else
@@ -215,17 +189,17 @@ bool Employee::setByLineData(std::vector<std::any> data)
         }
 
         // modified date
-        date_string = std::any_cast<std::string>(data[9]);
+        date_string = std::any_cast<std::string>(data[7]);
 
         if (date_string.empty())
             this->setModifiedDate({0, 0, 0, 0, 0, 0});
         else
         {
-            std::array<int, 6> arr_modified_date = utils::getDateFromString(date_string);
-            this->setModifiedDate(arr_modified_date);
+            std::array<int, 6> arr_last_modified = utils::getDateFromString(date_string);
+            this->setModifiedDate(arr_last_modified);
         }
 
-        this->setStatusByString(std::any_cast<std::string>(data[10]));
+        this->setStatusByString(std::any_cast<std::string>(data[8]));
 
         return true;
     }
@@ -241,7 +215,7 @@ bool Employee::setByLineData(std::vector<std::any> data)
 
 // getters
 // getter :: id
-int Employee::getId()
+int Employee::getId() const
 {
     return this->id;
 }
@@ -249,55 +223,37 @@ int Employee::getId()
 // getter :: username
 std::string Employee::getUsername()
 {
+    utils::convertToLowerCase(this->username);
     return this->username;
 }
 
 // getter :: password
-std::string Employee::getPassword()
+std::string Employee::getPassword() const
 {
     return this->password;
 }
 
-// getter :: first name
-std::string Employee::getFirstName()
+// getter :: name
+std::string Employee::getName()
 {
-    return this->first_name;
-}
-
-// getter :: middle name
-std::string Employee::getMiddleName()
-{
-    return this->middle_name;
-}
-
-// getter :: last name
-std::string Employee::getLastName()
-{
-    return this->last_name;
-}
-
-// getter :: full name
-std::string Employee::getFullName()
-{
-    if (this->middle_name.length() == 0)
-        return this->first_name + " " + this->last_name;
-    else
-        return this->first_name + " " + this->middle_name + " " + this->last_name;
+    utils::convertToWordCase(this->name);
+    return this->name;
 }
 
 // getter :: contact number
 std::string Employee::getContactNumber()
 {
+    utils::convertToWordCase(this->contact_number);
     return this->contact_number;
 }
 
 // getter :: status
-EMPLOYEE_STATUS Employee::getStatus()
+EMPLOYEE_STATUS Employee::getStatus() const
 {
     return this->status;
 }
 
-std::string Employee::getStatusString()
+std::string Employee::getStatusString() const
 {
     switch (this->status)
     {
@@ -311,25 +267,25 @@ std::string Employee::getStatusString()
 }
 
 // getter :: added date
-std::array<int, 6> Employee::getAddedDate()
+std::array<int, 6> Employee::getAddedDate() const
 {
     return this->added_date;
 }
 
 // getter :: removed date
-std::array<int, 6> Employee::getRemovedDate()
+std::array<int, 6> Employee::getRemovedDate() const
 {
     return this->removed_date;
 }
 
 // getter :: modified date
-std::array<int, 6> Employee::getModifiedDate()
+std::array<int, 6> Employee::getLastModified() const
 {
-    return this->modified_date;
+    return this->last_modified;
 }
 
 // get status integer
-int Employee::getStatusInteger(EMPLOYEE_STATUS status)
+int Employee::getStatusInteger(EMPLOYEE_STATUS status) const
 {
     switch (status)
     {
@@ -346,6 +302,7 @@ int Employee::getStatusInteger(EMPLOYEE_STATUS status)
 bool Employee::add()
 {
     int valid_id = 1;
+
     std::fstream file;
     std::string line, headline;
 
@@ -353,7 +310,7 @@ bool Employee::add()
 
     // open file and get latest id + 1
     file.open(app_files::filenames["employee"], std::ios::in); // open file in append mode
-    std::getline(file, headline);                       // get headline
+    std::getline(file, headline);                              // get headline
 
     // get valid id
     while (std::getline(file, line))
@@ -372,17 +329,18 @@ bool Employee::add()
         << this->id << ","
         << this->username << ","
         << this->password << ","
-        << this->first_name << ","
-        << this->middle_name << ","
-        << this->last_name << ","
+        << this->name << ","
         << this->contact_number << ","
         << utils::getDateString(this->added_date, true) << ","
         << utils::getDateString(this->removed_date, true) << ","
-        << utils::getDateString(this->modified_date, true) << ","
+        << utils::getDateString(this->last_modified, true) << ","
         << this->getStatusString() << "\n";
+
+    bool status = file.good();
+
     file.close();
 
-    return file.good();
+    return status;
 }
 
 // login
@@ -417,14 +375,12 @@ bool Employee::fetch(int id)
             this->id = temp.getId();
             this->username = temp.getUsername();
             this->password = temp.getPassword();
-            this->first_name = temp.getFirstName();
-            this->middle_name = temp.getMiddleName();
-            this->last_name = temp.getLastName();
+            this->name = temp.getName();
             this->contact_number = temp.getContactNumber();
             this->status = temp.getStatus();
             this->added_date = temp.getAddedDate();
             this->removed_date = temp.getRemovedDate();
-            this->modified_date = temp.getModifiedDate();
+            this->last_modified = temp.getLastModified();
 
             employee_found = true;
             break;
@@ -438,6 +394,7 @@ bool Employee::fetch(int id)
 void Employee::fetchAll()
 {
     Employee employee;
+
     std::string line;
     std::vector<Employee> employees;
     std::vector<std::any> line_data;
@@ -452,6 +409,7 @@ void Employee::fetchAll()
         employee.setByLineData(line_data);
         employees.push_back(employee);
     }
+
     Employee::LIST = employees;
 
     file.close();
@@ -479,13 +437,11 @@ bool Employee::update()
                 << temp.getId() << ","
                 << temp.getUsername() << ","
                 << temp.getPassword() << ","
-                << temp.getFirstName() << ","
-                << temp.getMiddleName() << ","
-                << temp.getLastName() << ","
+                << temp.getName() << ","
                 << temp.getContactNumber() << ","
                 << utils::getDateString(temp.getAddedDate(), true) << ","
                 << utils::getDateString(temp.getRemovedDate(), true) << ","
-                << utils::getDateString(temp.getModifiedDate(), true) << ","
+                << utils::getDateString(temp.getLastModified(), true) << ","
                 << temp.getStatusString() << "\n";
         }
         else
@@ -494,13 +450,11 @@ bool Employee::update()
                 << this->id << ","
                 << this->username << ","
                 << this->password << ","
-                << this->first_name << ","
-                << this->middle_name << ","
-                << this->last_name << ","
+                << this->name << ","
                 << this->contact_number << ","
                 << utils::getDateString(this->added_date, true) << ","
                 << utils::getDateString(this->removed_date, true) << ","
-                << utils::getDateString(this->modified_date, true) << ","
+                << utils::getDateString(this->last_modified, true) << ","
                 << this->getStatusString() << "\n";
         }
     }
@@ -512,58 +466,16 @@ bool Employee::update()
 // show employee details
 void Employee::show(bool adding)
 {
-    if(!adding)
+    if (!adding)
         std::cout << "ID               :: " << this->getId() << "\n";
     std::cout << "Username         :: " << this->getUsername();
     std::cout << "\nPassword         :: " << this->getPassword();
-    std::cout << "\nName             :: " << this->getFullName();
+    std::cout << "\nName             :: " << this->getName();
     std::cout << "\nContact Number   :: " << this->getContactNumber();
     std::cout << "\nJoined Date      :: " << utils::getDateString(this->getAddedDate(), false);
     std::cout << "\nRemoved Date     :: " << utils::getDateString(this->getRemovedDate(), false);
-    std::cout << "\nLast Modified    :: " << utils::getDateString(this->getModifiedDate(), false);
+    std::cout << "\nLast Modified    :: " << utils::getDateString(this->getLastModified(), false);
     std::cout << "\nStatus           :: " << this->getStatusString();
-}
-
-// remove
-bool Employee::remove(int target_id)
-{
-    std::fstream file;
-    std::string heading;
-
-    // open file and get headline
-    file.open(app_files::filenames["employee"], std::ios::in);
-    std::getline(file, heading);
-    file.close();
-
-    // open file and update line
-    file.open("new_employees.csv", std::ios::out);
-    file << heading << "\n"; // write heading
-
-    for (Employee temp : Employee::LIST)
-    {
-        if (temp.getId() == target_id)
-        {
-            temp.setRemovedDate(utils::getCurrentDateTime());
-            temp.setStatus(EMPLOYEE_STATUS::INACTIVE);
-        }
-
-        file
-            << temp.getId() << ","
-            << temp.getUsername() << ","
-            << temp.getPassword() << ","
-            << temp.getFirstName() << ","
-            << temp.getMiddleName() << ","
-            << temp.getLastName() << ","
-            << temp.getContactNumber() << ","
-            << utils::getDateString(temp.getAddedDate(), true) << ","
-            << utils::getDateString(temp.getRemovedDate(), true) << ","
-            << utils::getDateString(temp.getModifiedDate(), true) << ","
-            << temp.getStatusString() << "\n";
-    }
-
-    file.close();
-
-    return app_files::updateFile(app_files::filenames["employee"], "new_employees.csv");
 }
 
 #endif

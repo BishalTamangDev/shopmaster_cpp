@@ -30,10 +30,9 @@ public:
     void setName(std::string name);
 
     // getters
-    int getSalesId();
+    int getSalesId() const;
     std::string getName();
 
-    // other functions
     bool add();
     bool setByLineData(std::vector<std::any>);
 
@@ -41,7 +40,6 @@ public:
     static std::vector<Customer> fetchAll(); // fetch all customers
 };
 
-// function definition
 // setters
 // setter :: sales id
 void Customer::setSalesId(int sales_id)
@@ -58,7 +56,7 @@ void Customer::setName(std::string name)
 
 // getters
 // getter :: sales id
-int Customer::getSalesId()
+int Customer::getSalesId() const
 {
     return this->sales_id;
 }
@@ -66,6 +64,7 @@ int Customer::getSalesId()
 // getter :: name
 std::string Customer::getName()
 {
+    utils::convertToWordCase(this->name);
     return this->name;
 }
 
@@ -99,8 +98,7 @@ bool Customer::setByLineData(std::vector<std::any> data)
     }
 }
 
-// static functions
-// fetch all customers
+// static members :: fetch all customers
 std::vector<Customer> Customer::fetchAll()
 {
     std::string line;

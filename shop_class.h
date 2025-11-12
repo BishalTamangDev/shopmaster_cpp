@@ -37,43 +37,42 @@ public:
     }
 
     // setters
-    void setName(std::string &);
-    void setPan(std::string &);
-    void setContactNumber(std::string &);
-    void setCurrency(std::string &);
-    void setDistrict(std::string &);
-    void setMunicipality(std::string &);
-    void setToleVillage(std::string &);
-    void setWard(int &);
-    void setAddress(std::string &, std::string &, std::string &, int &); // set full address
-    bool setByLineData(std::vector<std::any> &);
+    void setName(std::string);
+    void setPan(std::string);
+    void setContactNumber(std::string);
+    void setCurrency(std::string);
+    void setDistrict(std::string);
+    void setMunicipality(std::string);
+    void setToleVillage(std::string);
+    void setWard(int);
+    void setAddress(std::string, std::string, std::string, int); // set full address
+    bool setByLineData(std::vector<std::any>);
 
     // getters
-    std::string getName();
-    std::string getPan();
-    std::string getContactNumber();
-    std::string getAddress(); // get full address
-    std::string getCurrency();
-    std::string getDistrict();
-    std::string getMunicipality();
-    std::string getToleVillage();
-    int getWard();
+    std::string getName() const;
+    std::string getPan() const;
+    std::string getContactNumber() const;
+    std::string getAddress() const; // get full address
+    std::string getCurrency() const;
+    std::string getDistrict() const;
+    std::string getMunicipality() const;
+    std::string getToleVillage() const;
+    int getWard() const;
 
-    bool isRegistered(); // check for shop registration
-    bool registerShop(); // register shop
+    bool registration(); // register shop
     bool fetch();        // fetch shop details
     bool update();       // update shop details
 };
 
 // setters
 // setter :: name
-void Shop::setName(std::string &name)
+void Shop::setName(std::string name)
 {
     utils::convertToWordCase(name);
     this->name = name;
 }
 
-bool Shop::setByLineData(std::vector<std::any> &data)
+bool Shop::setByLineData(std::vector<std::any> data)
 {
     bool status = false;
     try
@@ -101,52 +100,52 @@ bool Shop::setByLineData(std::vector<std::any> &data)
 }
 
 // setter :: pan
-void Shop::setPan(std::string &pan)
+void Shop::setPan(std::string pan)
 {
     utils::convertToWordCase(pan);
     this->pan = pan;
 }
 
 // setter :: contact number
-void Shop::setContactNumber(std::string &contact_number)
+void Shop::setContactNumber(std::string contact_number)
 {
     utils::convertToWordCase(contact_number);
     this->contact_number = contact_number;
 }
 
 // setter :: currency
-void Shop::setCurrency(std::string &currency)
+void Shop::setCurrency(std::string currency)
 {
     utils::convertToUpperCase(currency);
     this->currency = currency;
 }
 
 // setter :: district
-void Shop::setDistrict(std::string &district)
+void Shop::setDistrict(std::string district)
 {
     this->district = district;
 }
 
 // setter :: municipality
-void Shop::setMunicipality(std::string &municipality)
+void Shop::setMunicipality(std::string municipality)
 {
     this->municipality = municipality;
 }
 
 // setter :: tole village
-void Shop::setToleVillage(std::string &tole_village)
+void Shop::setToleVillage(std::string tole_village)
 {
     this->tole_village = tole_village;
 }
 
 // setter :: ward
-void Shop::setWard(int &ward)
+void Shop::setWard(int ward)
 {
     this->ward = ward;
 }
 
 // setter :: address
-void Shop::setAddress(std::string &district, std::string &municipality, std::string &tole_village, int &ward)
+void Shop::setAddress(std::string district, std::string municipality, std::string tole_village, int ward)
 {
     utils::convertToWordCase(district);
     utils::convertToWordCase(municipality);
@@ -160,76 +159,61 @@ void Shop::setAddress(std::string &district, std::string &municipality, std::str
 
 // getters
 // getter :: name
-std::string Shop::getName()
+std::string Shop::getName() const
 {
     return this->name;
 }
 
 // getter :: pan
-std::string Shop::getPan()
+std::string Shop::getPan() const
 {
     return this->pan;
 }
 
 // getter :: contact number
-std::string Shop::getContactNumber()
+std::string Shop::getContactNumber() const
 {
     return this->contact_number;
 }
 
 // getter :: currency
-std::string Shop::getCurrency()
+std::string Shop::getCurrency() const
 {
     return this->currency;
 }
 
 // getter :: district
-std::string Shop::getDistrict()
+std::string Shop::getDistrict() const
 {
     return this->district;
 }
 
 // getter :: municipality
-std::string Shop::getMunicipality()
+std::string Shop::getMunicipality() const
 {
     return this->municipality;
 }
 
 // getter :: tole/village
-std::string Shop::getToleVillage()
+std::string Shop::getToleVillage() const
 {
     return this->tole_village;
 }
 
 // getter :: ward
-int Shop::getWard()
+int Shop::getWard() const
 {
     return this->ward;
 }
 
 // get address
-std::string Shop::getAddress()
+std::string Shop::getAddress() const
 {
-    std::string address = this->tole_village + ", " + this->municipality + " - " + std::to_string(this->ward) + ", " + this->district;
-    return address;
-}
-
-// check for shop registration
-bool Shop::isRegistered()
-{
-    std::string line;
-    std::vector<std::any> data;
-    std::ifstream file(app_files::filenames["shop"]);
-
-    std::getline(file, line); // healine
-    std::getline(file, line); // get shop details
-    file.close();             // close file
-
-    return line.length() != 0;
+    return this->tole_village + ", " + this->municipality + " - " + std::to_string(this->ward) + ", " + this->district;
 }
 
 // register shop
-bool Shop::registerShop()
+bool Shop::registration()
 {
     std::ofstream file(app_files::filenames["shop"], std::ios::app);
 
