@@ -166,7 +166,7 @@ void admin_view::updateUsername(Admin admin)
         else
             utils::showMessage(MESSAGE_TYPE::FAILURE, "\n\nUsername updation failed!");
 
-        utils::showMessage(MESSAGE_TYPE::INFO, "\n\nPress any key to continue...");
+        std::cout << "\n\nPress any key to continue...";
 
         utils::pauseScreen();
 
@@ -233,7 +233,7 @@ void admin_view::updatePassword(Admin admin)
         else
             utils::showMessage(MESSAGE_TYPE::FAILURE, "\nPassword updation failed!");
 
-        utils::showMessage(MESSAGE_TYPE::INFO, "\n\nPress any key to continue...");
+        std::cout << "\n\nPress any key to continue...";
 
         utils::pauseScreen();
 
@@ -261,7 +261,7 @@ void admin_view::updateName(Admin admin)
     else
         utils::showMessage(MESSAGE_TYPE::FAILURE, "\n\nName updation failed!");
 
-    utils::showMessage(MESSAGE_TYPE::INFO, "\n\nPress any key to continue...");
+    std::cout << "\n\nPress any key to continue...";
 
     utils::pauseScreen();
 }

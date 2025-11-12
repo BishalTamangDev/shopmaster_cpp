@@ -36,7 +36,7 @@ void shop_view::menu()
         if (!response)
         {
             utils::showMessage(MESSAGE_TYPE::FAILURE, "Couldn't fetch shop details!");
-            utils::showMessage(MESSAGE_TYPE::INFO, "\n\nPress any key to go back...");
+            std::cout << "\n\nPress any key to go back...";
             utils::pauseScreen();
             return;
         }

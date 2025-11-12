@@ -38,7 +38,7 @@ public:
 };
 
 // setters
-// setter :: set username
+// setter :: username
 void Admin::setUsername(std::string username)
 {
     utils::eraseWhiteSpace(username);
@@ -46,7 +46,7 @@ void Admin::setUsername(std::string username)
     this->username = username;
 }
 
-// setter :: set password
+// setter :: password
 void Admin::setPassword(std::string password)
 {
     utils::eraseWhiteSpace(password);
@@ -81,13 +81,13 @@ bool Admin::setByLineData(std::vector<std::any> data)
 }
 
 // getters
-// getter :: get username
+// getter :: username
 std::string Admin::getUsername() const
 {
     return this->username;
 }
 
-// getter :: get password
+// getter :: password
 std::string Admin::getPassword() const
 {
     return this->password;

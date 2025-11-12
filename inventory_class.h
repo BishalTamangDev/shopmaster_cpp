@@ -263,10 +263,13 @@ bool Product::add()
         << utils::getDateString(this->removed_date, true) << ","
         << utils::getDateString(this->last_modified_date, true) << ","
         << this->getStatusString() << "\n";
-    
+
     bool status = file.good();
 
     file.close();
+
+    std::thread fetch_product_thread(Product::fetchAll);
+    fetch_product_thread.detach();
 
     return status;
 }
@@ -305,7 +308,45 @@ void Product::view()
 // update product details
 bool Product::update()
 {
-    return true;
+    std::fstream file;
+    std::string heading;
+
+    // open file and get headline
+    file.open(app_files::filenames["product"], std::ios::in);
+    std::getline(file, heading);
+    file.close();
+
+    // open file and update line
+    file.open("new_products.csv", std::ios::out);
+    file << heading << "\n"; // write heading
+
+    for (Product temp : Product::LIST)
+    {
+        if (temp.getId() == this->getId())
+        {
+            temp.setName(this->getName());
+            temp.setRate(this->getRate());
+            temp.setLastModifiedDate(this->getLastModifiedDate());
+        }
+
+        file
+            << temp.getId() << ","
+            << temp.getName() << ","
+            << temp.getRate() << ","
+            << temp.getQuantity() << ","
+            << utils::getDateString(temp.getAddedDate(), true) << ","
+            << utils::getDateString(temp.getRemovedDate(), true) << ","
+            << utils::getDateString(temp.getLastModifiedDate(), true) << ","
+            << temp.getStatusString() << "\n";
+    }
+
+    // background process :: fetch products
+    std::thread fetch_products_thread(Product::fetchAll);
+    fetch_products_thread.detach();
+
+    file.close();
+
+    return app_files::updateFile(app_files::filenames["product"], "new_products.csv");
 }
 
 // remove product
@@ -343,6 +384,10 @@ bool Product::remove()
     }
 
     file.close();
+
+    // background process :: fetch products
+    std::thread fetch_products_thread(Product::fetchAll);
+    fetch_products_thread.detach();
 
     return app_files::updateFile(app_files::filenames["product"], "new_products.csv");
 }

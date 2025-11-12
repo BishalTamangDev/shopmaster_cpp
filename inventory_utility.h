@@ -89,21 +89,22 @@ bool inventory_utility::searchById(int target_id, Product &product)
 bool inventory_utility::validProductName(std::string str)
 {
 
-    if(Product::LIST.empty())
+    if (Product::LIST.empty())
         return true;
 
-    for(Product product : Product::LIST)
-        if(product.getName() == str)
+    for (Product product : Product::LIST)
+        if (product.getName() == str)
             return false;
 
     return true;
 }
 
 // get valid id :: get greatest id + 1
-int inventory_utility::getValidId() {
+int inventory_utility::getValidId()
+{
     int id = 1;
 
-    if(!Product::LIST.empty())
+    if (!Product::LIST.empty())
     {
         for (Product product : Product::LIST)
             if (product.getId() > id)
@@ -113,7 +114,6 @@ int inventory_utility::getValidId() {
 
     return id;
 }
-
 
 // search by name
 std::vector<Product> inventory_utility::searchByName(std::string target_name)

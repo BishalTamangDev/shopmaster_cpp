@@ -197,8 +197,6 @@ void inventory_view::addNewProduct()
                 else
                 {
                     utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nProduct added successfully!");
-                    std::thread fetch_product_thread(Product::fetchAll);
-                    fetch_product_thread.detach();
                 }
             }
         }
@@ -418,8 +416,135 @@ void inventory_view::viewProductMenu()
 // inventory view :: update details
 void inventory_view::updateProductDetails()
 {
-    utils::header("UPDATE PRODUCT DETAILS");
-    utils::pauseScreen();
+    int id;
+    double rate;
+    bool valid_id, detail_updated;
+    std::string buffer;
+    Product product, updated_product;
+
+    while (true)
+    {
+        detail_updated = false;
+
+        utils::header("UPDATE PRODUCT DETAILS");
+
+        // get product id
+        std::cout << "Enter product ID to update :: ";
+        std::getline(std::cin, buffer);
+
+        try
+        {
+            id = std::stoi(buffer);
+            product.setId(id);
+            valid_id = true;
+        }
+        catch (const std::invalid_argument &e)
+        {
+            valid_id = false;
+            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid input!");
+        }
+
+        if (valid_id)
+        {
+            if (!product.fetch())
+                utils::showMessage(MESSAGE_TYPE::INFO, "\nProduct not found!");
+            else
+            {
+                // preview product details
+                std::cout << "\n";
+                product.view();
+
+                // check for correct product
+                std::cout << "\n\nAre you sure you want to update this product [y/n]? ";
+                std::getline(std::cin, buffer);
+
+                if (buffer == "y" || buffer == "Y")
+                {
+                    // get new details
+                    std::cout << "\nGETTING NEW DETAILS\n";
+
+                    updated_product = product;
+
+                    // name
+                    std::cout << "\nName        :: ";
+                    std::getline(std::cin, buffer);
+
+                    if (!buffer.empty())
+                    {
+                        // todo :: check if the name is already taken
+                        utils::convertToWordCase(buffer);
+                        if (buffer != product.getName())
+                        {
+                            detail_updated = true;
+                            updated_product.setName(buffer);
+                        }
+                    }
+
+                    // rate
+                    while (true)
+                    {
+                        std::cout << "\nRate        :: ";
+                        std::getline(std::cin, buffer);
+
+                        if (buffer.empty())
+                            break;
+                        else
+                        {
+                            try
+                            {
+                                rate = std::stod(buffer);
+
+                                if (rate > 0.0)
+                                {
+                                    if (rate != product.getRate())
+                                    {
+                                        detail_updated = true;
+                                        updated_product.setRate(rate);
+                                    }
+                                    break;
+                                }
+                                else
+                                    utils::showMessage(MESSAGE_TYPE::INFO, "\nInvalid rate!\n");
+                            }
+                            catch (const std::invalid_argument &e)
+                            {
+                                utils::showMessage(MESSAGE_TYPE::INFO, "\nInvalid input!\n");
+                            }
+                        }
+                    }
+
+                    if (!detail_updated)
+                        utils::showMessage(MESSAGE_TYPE::INFO, "\nNo details to be updated updated!\n");
+                    else
+                    {
+                        updated_product.setLastModifiedDate(utils::getCurrentDateTime()); // get latest date
+
+                        std::cout << "\nUPDATED PRODUCT DETAILS\n\n";
+                        updated_product.view();
+
+                        std::cout << "\n\nAre you sure you want to update this product [y/n]? ";
+                        std::getline(std::cin, buffer);
+
+                        if (buffer != "y" && buffer != "Y")
+                            utils::showMessage(MESSAGE_TYPE::INFO, "\nProduct update cancelled!\n");
+                        else
+                        {
+                            if (updated_product.update())
+                                utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nProduct updated successfully!\n");
+                            else
+                                utils::showMessage(MESSAGE_TYPE::FAILURE, "\nProduct update failed!\n");
+                        }
+                    }
+                }
+            }
+        }
+
+        std::cout << "\nDo you want to update another product [y/n]? ";
+        std::getline(std::cin, buffer);
+
+        if (buffer != "y" && buffer != "y")
+            break;
+    }
 }
 
 // inventory view :: add to stock
@@ -435,7 +560,7 @@ void inventory_view::restock()
         utils::header("RESTOCK");
 
         // get product id
-        std::cout << "Enter product ID to  :: ";
+        std::cout << "Enter product ID to restock :: ";
         std::getline(std::cin, id_str);
 
         try
@@ -554,7 +679,6 @@ void inventory_view::remove()
                 else
                 {
                     std::cout << "\nAre you sure you want to remove this product [y/n]? ";
-                    // ask user for removal confirmation
                     std::getline(std::cin, choice);
 
                     if (choice == "y" || choice == "Y")

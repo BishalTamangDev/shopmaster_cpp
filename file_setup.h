@@ -65,7 +65,7 @@ void app_files::setup()
     for (const auto &headline : headlines)
     {
         required_heading_titles = headline.second; // get heading titles
-        actual_heading_titles.clear();         // clear actual heading titles
+        actual_heading_titles.clear();             // clear actual heading titles
 
         fin.open(headline.first);
 
