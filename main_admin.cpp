@@ -25,14 +25,6 @@ int main()
     std::thread file_setup(app_files::setup); // file setup thread
     file_setup.detach();
 
-    // background process :: fetch employees
-    std::thread fetch_employees_thread(Employee::fetchAll);
-    fetch_employees_thread.detach();
-
-    // background process :: fetch products
-    std::thread fetch_products_thread(Product::fetchAll);
-    fetch_products_thread.detach();
-
     // check if admain has been registered yet
     if (!admin_utility::adminRegistered())
     {

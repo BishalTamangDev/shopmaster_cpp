@@ -10,7 +10,7 @@
 
 namespace employee_utility
 {
-    bool remove(int); // remove employee
+    bool remove(int);                          // remove employees
 }
 
 // remove employee
@@ -28,7 +28,7 @@ bool employee_utility::remove(int target_id)
     file.open(temporay_file, std::ios::out);
     file << heading << "\n"; // write heading
 
-    for (Employee temp : Employee::LIST)
+    for (Employee temp : Employee::fetchAllEmployees())
     {
         if (temp.getId() == target_id)
         {

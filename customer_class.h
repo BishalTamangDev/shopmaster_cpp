@@ -37,7 +37,7 @@ public:
     bool setByLineData(std::vector<std::any>);
 
     // static functions
-    static std::vector<Customer> fetchAll(); // fetch all customers
+    static std::vector<Customer> fetchAllCustomers(); // fetch all customers
 };
 
 // setters
@@ -99,7 +99,7 @@ bool Customer::setByLineData(std::vector<std::any> data)
 }
 
 // static members :: fetch all customers
-std::vector<Customer> Customer::fetchAll()
+std::vector<Customer> Customer::fetchAllCustomers()
 {
     std::string line;
     Customer customer;

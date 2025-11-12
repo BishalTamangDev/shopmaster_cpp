@@ -1,6 +1,4 @@
 #include <iostream>
-#include <chrono>
-#include <thread>
 
 // import user-defined header files
 #include "admin_class.h"

@@ -59,7 +59,7 @@ void customer_view::viewAll()
 {
     utils::header("ALL CUSTOMERS");
 
-    std::vector<Customer> customers = Customer::fetchAll();
+    std::vector<Customer> customers = Customer::fetchAllCustomers();
 
     if (customers.size() == 0)
         utils::showMessage(MESSAGE_TYPE::INFO, "No customers found!\n");
@@ -81,7 +81,7 @@ void customer_view::searchBySalesId()
     bool found, valid_id;
     std::string sales_id_str, choice;
 
-    std::vector<Customer> customers = Customer::fetchAll();
+    std::vector<Customer> customers = Customer::fetchAllCustomers();
 
     while (true)
     {
@@ -143,7 +143,7 @@ void customer_view::searchByName()
     bool found;
     std::string name, target_name, choice;
 
-    std::vector<Customer> customers = Customer::fetchAll();
+    std::vector<Customer> customers = Customer::fetchAllCustomers();
 
     while (true)
     {

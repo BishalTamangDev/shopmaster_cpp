@@ -19,6 +19,7 @@ bool mainMenu();
 // main
 int main()
 {
+    // background process :: file setup
     std::thread file_setup(app_files::setup); // file setup thread
     file_setup.detach();                      // run file setup task in the background independently
 

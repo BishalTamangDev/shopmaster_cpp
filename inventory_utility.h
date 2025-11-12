@@ -40,7 +40,8 @@ bool inventory_utility::restock(int id, int qty)
 
     file.open(temporary_file, std::ios::out);
     file << headline << "\n";
-    for (Product &product : Product::LIST)
+    
+    for (Product &product : Product::fetchAllProducts())
     {
         if (product.getId() == id)
         {
@@ -72,7 +73,7 @@ bool inventory_utility::searchById(int target_id, Product &product)
 {
     bool found = false;
 
-    for (Product temp : Product::LIST)
+    for (Product temp : Product::fetchAllProducts())
     {
         if (temp.getId() == target_id)
         {
@@ -88,11 +89,12 @@ bool inventory_utility::searchById(int target_id, Product &product)
 // check if the product name is already taken
 bool inventory_utility::validProductName(std::string str)
 {
+    std::vector<Product> products = Product::fetchAllProducts(); // fetch all products
 
-    if (Product::LIST.empty())
+    if (products.empty())
         return true;
 
-    for (Product product : Product::LIST)
+    for (Product product : products)
         if (product.getName() == str)
             return false;
 
@@ -104,9 +106,11 @@ int inventory_utility::getValidId()
 {
     int id = 1;
 
-    if (!Product::LIST.empty())
+    std::vector<Product> products = Product::fetchAllProducts(); // fetch all products
+
+    if (!products.empty())
     {
-        for (Product product : Product::LIST)
+        for (Product product : products)
             if (product.getId() > id)
                 id = product.getId();
         id++;
@@ -119,11 +123,12 @@ int inventory_utility::getValidId()
 std::vector<Product> inventory_utility::searchByName(std::string target_name)
 {
     std::string name;
-    std::vector<Product> products = {};
+    
+    std::vector<Product> products = Product::fetchAllProducts(); // fetch all products
 
     utils::convertToLowerCase(target_name); // convert target name into lowercase
 
-    for (Product temp : Product::LIST)
+    for (Product temp : products)
     {
         name = temp.getName();
         utils::convertToLowerCase(name); // convert name into lowercase
@@ -140,7 +145,7 @@ std::vector<Product> inventory_utility::fetchAvailableProducts()
 {
     std::vector<Product> available_products = {};
 
-    for (Product product : Product::LIST)
+    for (Product product : Product::fetchAllProducts())
         if (product.getStatus() == PRODUCT_STATUS::AVAILABLE)
             available_products.push_back(product);
 
@@ -152,7 +157,7 @@ std::vector<Product> inventory_utility::fetchOutOfStockProducts()
 {
     std::vector<Product> out_of_stock_products = {};
 
-    for (Product product : Product::LIST)
+    for (Product product : Product::fetchAllProducts())
         if (product.getStatus() == PRODUCT_STATUS::OUT_OF_STOCK || product.getQuantity() == 0)
             out_of_stock_products.push_back(product);
 

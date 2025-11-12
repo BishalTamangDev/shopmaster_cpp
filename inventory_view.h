@@ -1,6 +1,5 @@
 #include <iostream>
 #include <chrono>
-#include <thread>
 
 // import user-defined header files
 #include "inventory_utility.h"
@@ -35,10 +34,12 @@ void inventory_view::viewProducts()
 
     utils::showLine(spaces, {"ID", "Name", "Rate", "Qty", "Added On", "Removed On", "Last Modified", "Status"});
 
-    if (Product::LIST.empty())
+    std::vector<Product> products = Product::fetchAllProducts();
+
+    if (products.empty())
         utils::showMessage(MESSAGE_TYPE::INFO, "\nNo product has been been added yet!\n");
     else
-        for (Product product : Product::LIST)
+        for (Product product : products)
             utils::showLine(spaces, {std::to_string(product.getId()), product.getName(), std::to_string(product.getRate()), std::to_string(product.getQuantity()), utils::getDateString(product.getAddedDate(), false), utils::getDateString(product.getRemovedDate(), false), utils::getDateString(product.getLastModifiedDate(), false), product.getStatusString()});
 
     std::cout << "\nPress any key to continue...";
@@ -352,7 +353,7 @@ void inventory_view::searchByName()
         std::cout << "\n";
         utils::showLine(spaces, {"ID", "Name", "Rate", "Qty", "Added On", "Removed On", "Last Modified", "Status"});
 
-        for (Product product : Product::LIST)
+        for (Product product : Product::fetchAllProducts())
         {
             name = product.getName();
             utils::convertToLowerCase(name);
@@ -684,10 +685,7 @@ void inventory_view::remove()
                     if (choice == "y" || choice == "Y")
                     {
                         if (product.remove())
-                        {
                             utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nProduct removed successfully!");
-                            Product::fetchAll(); // update product list
-                        }
                         else
                             utils::showMessage(MESSAGE_TYPE::FAILURE, "\nProduct removal failed!");
                     }

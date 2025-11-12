@@ -1,5 +1,4 @@
 #include <iostream>
-#include <thread>
 
 // import user-defined header files
 #include "utils.h"
@@ -133,7 +132,9 @@ void employee_view::viewAll()
 {
     utils::header("VIEW ALL EMPLOYEES");
 
-    if (Employee::LIST.size() == 0)
+    std::vector<Employee> employees = Employee::fetchAllEmployees();
+
+    if (employees.size() == 0)
     {
         utils::showMessage(MESSAGE_TYPE::INFO, "No employees found!");
         std::cout << "\n\nPress any key to go back...";
@@ -144,7 +145,7 @@ void employee_view::viewAll()
     std::vector<int> spaces = {7, 22, 13, 12, 13, 12, 12, 16, 9};
     utils::showLine(spaces, {"ID", "Name", "Username", "Password", "Contact No.", "Added On", "Removed On", "Last Modified", "Status"});
 
-    for (Employee &employee : Employee::LIST)
+    for (Employee &employee : employees)
         utils::showLine(spaces, {std::to_string(employee.getId()), employee.getName(), employee.getUsername(), employee.getPassword(), employee.getContactNumber(), utils::getDateString(employee.getAddedDate(), false), utils::getDateString(employee.getRemovedDate(), false), utils::getDateString(employee.getLastModified(), false), employee.getStatusString()});
 
     std::cout << "\nPress any key to continue...";
@@ -158,9 +159,13 @@ void employee_view::searchById()
     bool found = false;
     std::string id_str, choice;
 
+    std::vector<Employee> employees;
+    
     while (true)
     {
         found = false;
+
+        employees = Employee::fetchAllEmployees(); // fetch all employees
 
         utils::header("SEARCH EMPLOYEE BY ID");
         std::cout << "Enter employee ID to search :: ";
@@ -170,7 +175,7 @@ void employee_view::searchById()
         {
             id = std::stoi(id_str);
 
-            for (Employee employee : Employee::LIST)
+            for (Employee employee : employees)
             {
                 if (employee.getId() == id)
                 {
@@ -201,16 +206,20 @@ void employee_view::searchByUsername()
 {
     bool found = false;
     std::string username, choice;
-
+    
+    std::vector<Employee> employees = Employee::fetchAllEmployees(); // fetch all employees
+    
     while (true)
     {
         found = false;
+        employees = Employee::fetchAllEmployees(); // fetch all employees
+        
         utils::header("SEARCH EMPLOYEE BY USERNAME");
 
         std::cout << "Enter username to search :: ";
         std::getline(std::cin, username);
 
-        for (Employee employee : Employee::LIST)
+        for (Employee employee : employees)
         {
             if (employee.getUsername() == username)
             {
@@ -240,15 +249,19 @@ void employee_view::add()
 
     std::string choice, username, password, name, contact_number;
 
+    std::vector<Employee> employees;
+    
     while (true)
     {
         valid_username = true;
+
+        employees = Employee::fetchAllEmployees(); // fetch all employees
 
         utils::header("ADD NEW EMPLOYEE");
         std::cout << "Username          :: ";
         std::getline(std::cin, username);
 
-        for (Employee temp_employee : Employee::LIST)
+        for (Employee temp_employee : employees)
         {
             if (temp_employee.getUsername() == username)
             {
@@ -305,11 +318,7 @@ void employee_view::add()
     else
     {
         if (employee.add())
-        {
             utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nEmployee added successfully!");
-            std::thread fetch_employees_thread(Employee::fetchAll);
-            fetch_employees_thread.detach();
-        }
         else
             utils::showMessage(MESSAGE_TYPE::FAILURE, "\nEmployee addition failed!");
     }
@@ -327,8 +336,12 @@ void employee_view::update()
     std::string id_str, choice;
     Employee employee;
 
+    std::vector<Employee> employees;
+    
     while (true)
     {
+        employees = Employee::fetchAllEmployees(); // fetch all employees
+        
         utils::header("UPDATE EMPLOYEE DETAILS");
 
         std::cout << "Enter employee ID to update :: ";
@@ -340,7 +353,7 @@ void employee_view::update()
 
             // check for id presence
             id_found = false;
-            for (Employee temp : Employee::LIST)
+            for (Employee temp : employees)
                 if (temp.getId() == id)
                 {
                     id_found = true;
@@ -414,7 +427,7 @@ void employee_view::update()
         if (username.empty())
             break;
 
-        for (Employee temp : Employee::LIST)
+        for (Employee temp : employees)
         {
             if (temp.getUsername() == username)
             {
@@ -503,13 +516,7 @@ void employee_view::update()
     bool response = employee.update();
 
     if (response)
-    {
-        // background :: fetch employees
-        std::thread fetch_employees_thread(Employee::fetchAll);
-        fetch_employees_thread.detach();
-
         utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nEmployee updated successfully!");
-    }
     else
         utils::showMessage(MESSAGE_TYPE::FAILURE, "\nEmployee updation failed!");
 
@@ -523,13 +530,17 @@ void employee_view::remove()
     int id;
     bool id_found, valid_id, already_removed;
     std::string id_str, choice;
+    
     Employee employee;
-
+    std::vector<Employee> employees;
+    
     while (true)
     {
         valid_id = false;
         id_found = false;
         already_removed = false;
+
+        employees = Employee::fetchAllEmployees(); // fetch all employees
 
         utils::header("REMOVE EMPLOYEE");
 
@@ -550,7 +561,7 @@ void employee_view::remove()
         if (valid_id) // valid employee id
         {
             // check the presence of id
-            for (Employee temp : Employee::LIST)
+            for (Employee temp : employees)
             {
                 if (temp.getId() == id)
                 {
@@ -593,13 +604,7 @@ void employee_view::remove()
                     {
                         // remove employee
                         if (employee_utility::remove(id))
-                        {
                             utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nEmployee removed successfully!");
-
-                            // background :: update employee list
-                            std::thread fetch_employees_thread(Employee::fetchAll);
-                            fetch_employees_thread.detach();
-                        }
                         else
                             utils::showMessage(MESSAGE_TYPE::FAILURE, "\nCouldn't remove employee!");
                     }

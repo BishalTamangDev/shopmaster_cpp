@@ -81,12 +81,8 @@ public:
     bool remove(); // remove product
 
     // static members
-    static std::vector<Product> LIST;
-    static void fetchAll(); // fetch all products
+    static std::vector<Product> fetchAllProducts(); // fetch all products
 };
-
-// static :: product list
-std::vector<Product> Product::LIST = {};
 
 // setters
 // setter :: id
@@ -268,9 +264,6 @@ bool Product::add()
 
     file.close();
 
-    std::thread fetch_product_thread(Product::fetchAll);
-    fetch_product_thread.detach();
-
     return status;
 }
 
@@ -279,7 +272,7 @@ bool Product::fetch()
 {
     bool found = false;
 
-    for (Product temp : Product::LIST)
+    for (Product temp : Product::fetchAllProducts())
     {
         if (temp.getId() == this->getId())
         {
@@ -320,7 +313,7 @@ bool Product::update()
     file.open("new_products.csv", std::ios::out);
     file << heading << "\n"; // write heading
 
-    for (Product temp : Product::LIST)
+    for (Product temp : Product::fetchAllProducts())
     {
         if (temp.getId() == this->getId())
         {
@@ -339,10 +332,6 @@ bool Product::update()
             << utils::getDateString(temp.getLastModifiedDate(), true) << ","
             << temp.getStatusString() << "\n";
     }
-
-    // background process :: fetch products
-    std::thread fetch_products_thread(Product::fetchAll);
-    fetch_products_thread.detach();
 
     file.close();
 
@@ -364,7 +353,7 @@ bool Product::remove()
     file.open("new_products.csv", std::ios::out);
     file << heading << "\n"; // write heading
 
-    for (Product temp : Product::LIST)
+    for (Product temp : Product::fetchAllProducts())
     {
         if (temp.getId() == this->getId())
         {
@@ -385,15 +374,11 @@ bool Product::remove()
 
     file.close();
 
-    // background process :: fetch products
-    std::thread fetch_products_thread(Product::fetchAll);
-    fetch_products_thread.detach();
-
     return app_files::updateFile(app_files::filenames["product"], "new_products.csv");
 }
 
 // static member :: fetch all products
-void Product::fetchAll()
+std::vector<Product> Product::fetchAllProducts()
 {
     Product product;
     std::string line;
@@ -411,9 +396,9 @@ void Product::fetchAll()
         products.push_back(product);
     }
 
-    Product::LIST = products;
-
     fin.close();
+
+    return products;
 }
 
 #endif

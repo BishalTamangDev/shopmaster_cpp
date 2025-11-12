@@ -15,8 +15,8 @@
 // employee status enum
 enum class EMPLOYEE_STATUS
 {
-    INACTIVE = 0,
-    ACTIVE = 1,
+    INACTIVE,
+    ACTIVE,
 };
 
 // class :: Employee
@@ -80,12 +80,9 @@ public:
     bool update();                               // update
     void show(bool);                             // show employee details
 
-    // static variables & functions
-    static std::vector<Employee> LIST;
-    static void fetchAll(); // fetch employee details
+    // static members
+    static std::vector<Employee> fetchAllEmployees(); // fetch all employees
 };
-
-std::vector<Employee> Employee::LIST;
 
 // setters
 // setter :: id
@@ -348,9 +345,7 @@ bool Employee::login(std::string username, std::string password, int &current_em
 {
     bool status = false;
 
-    Employee::fetchAll(); // update employee list
-
-    for (Employee employee : Employee::LIST)
+    for (Employee employee : Employee::fetchAllEmployees())
     {
         if (employee.getUsername() == username && employee.getPassword() == password)
         {
@@ -368,7 +363,7 @@ bool Employee::fetch(int id)
 {
     bool employee_found = false;
 
-    for (Employee temp : Employee::LIST)
+    for (Employee temp : Employee::fetchAllEmployees())
     {
         if (temp.getId() == id)
         {
@@ -391,7 +386,7 @@ bool Employee::fetch(int id)
 }
 
 // fetch employee details
-void Employee::fetchAll()
+std::vector<Employee> Employee::fetchAllEmployees()
 {
     Employee employee;
 
@@ -410,9 +405,9 @@ void Employee::fetchAll()
         employees.push_back(employee);
     }
 
-    Employee::LIST = employees;
-
     file.close();
+
+    return employees;
 }
 
 // update username
@@ -429,7 +424,7 @@ bool Employee::update()
     file.open("new_employee.csv", std::ios::out);
     file << heading << "\n"; // write heading
 
-    for (Employee &temp : Employee::LIST)
+    for (Employee &temp : Employee::fetchAllEmployees())
     {
         if (temp.getId() != this->id)
         {
