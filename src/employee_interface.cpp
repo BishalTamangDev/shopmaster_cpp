@@ -1,28 +1,8 @@
-#include <iostream>
-
-// import user-defined header files
-#include "utils.h"
-#include "employee_class.h"
-#include "employee_utility.h"
-
-#ifndef SHOPMASTER_EMPLOYEE_VIEW_H
-#define SHOPMASTER_EMPLOYEE_VIEW_H
-
-namespace employee_view
-{
-    void adminMenu();        // menu
-    void add();              // add new employee
-    void showDetails(int);   // my details
-    void update();           // update employee details
-    void remove();           // remove employee
-    bool login(int &);       // login
-    void viewAll();          // view all employees
-    void searchById();       // search employee by id
-    void searchByUsername(); // search employee by username
-}
+// include header file
+#include "../include/employee_interface.h"
 
 // admin menu
-void employee_view::adminMenu()
+void employee_interface::adminMenu()
 {
     std::string choice;
     const std::map<int, std::string> options = {
@@ -37,68 +17,73 @@ void employee_view::adminMenu()
 
     while (true)
     {
-        utils::header("EMPLOYEE view MENU");
+        utility::header("EMPLOYEE view MENU");
 
         for (const auto &options : options)
-            utils::showOption(options.first, options.second);
+            utility::showOption(options.first, options.second);
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
-            employee_view::viewAll(); // view employees
+            employee_interface::viewAll(); // view employees
         else if (choice == "2")
-            employee_view::searchById(); // search employee by id
+            employee_interface::searchById(); // search employee by id
         else if (choice == "3")
-            employee_view::searchByUsername(); // search employee by username
+            employee_interface::searchByUsername(); // search employee by username
         else if (choice == "4")
-            employee_view::add(); // add employee
+            employee_interface::add(); // add employee
         else if (choice == "5")
-            employee_view::update(); // update
+            employee_interface::update(); // update
         else if (choice == "6")
-            employee_view::remove(); // remove employee
+            employee_interface::remove(); // remove employee
         else if (choice == "7")
             return;
         else
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
-            utils::pauseScreen();
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
+            utility::pauseScreen();
         }
     }
 }
 
 // employee :: show details
-void employee_view::showDetails(int current_employee_id)
+void employee_interface::showDetails(int current_employee_id)
 {
     Employee employee;
 
-    bool response = employee.fetch(current_employee_id);
+    EmployeeManager employeeManager;
 
-    utils::header("MY ACCOUNT DETAILS");
+    bool response = employeeManager.fetch(current_employee_id, employee);
+
+    utility::header("MY ACCOUNT DETAILS");
 
     if (!response)
-        utils::showMessage(MESSAGE_TYPE::FAILURE, "Couldn't fetch employee details!");
+        utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "Couldn't fetch employee details!");
     else
         employee.show(false);
 
     std::cout << "\n\nPress any key to continue...";
 
-    utils::pauseScreen();
+    utility::pauseScreen();
 }
 
 // login
-bool employee_view::login(int &current_employee_id)
+bool employee_interface::login(int &current_employee_id)
 {
+    Employee employee;
+    EmployeeManager employeeManager;
+
     int chance = 3;
     bool status = false;
-    std::string username, password;
-    Employee employee;
+
+    std::string choice, username, password;
 
     while (true)
     {
         chance--;
 
-        utils::header("EMPLOYEE LOGIN");
+        utility::header("EMPLOYEE LOGIN");
 
         std::cout << "Username :: ";
         std::getline(std::cin, username);
@@ -106,68 +91,82 @@ bool employee_view::login(int &current_employee_id)
         std::cout << "\nPassword :: ";
         std::getline(std::cin, password);
 
-        if (employee.login(username, password, current_employee_id))
+        if (employeeManager.login(username, password, current_employee_id))
         {
             status = true;
             break;
         }
 
-        utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid username or password!");
+        utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid username or password!");
 
         if (chance == 0)
         {
-            utils::showMessage(MESSAGE_TYPE::INFO, "\n\nYou entered your credentials 3 times incorrectly!");
-            break;
-        }
+            utility::showMessage(utility::MESSAGE_TYPE::INFO, "\n\nYou entered your credentials 3 times incorrectly!");
 
-        std::cout << "\n\nPress any key to try again...";
-        utils::pauseScreen();
+            std::cout << "\n\nExiting the program...";
+
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+
+            exit(0);
+        }
+        else
+        {
+            std::cout << "\n\nDo you want to try again [y/n]? ";
+            std::getline(std::cin, choice);
+
+            if (choice != "Y" && choice != "y")
+            {
+                std::cout << "\nExiting program...\n";
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+                exit(0);
+            }
+        }
     }
 
     return status;
 }
 
 // employee :: view all employees
-void employee_view::viewAll()
+void employee_interface::viewAll()
 {
-    utils::header("VIEW ALL EMPLOYEES");
+    utility::header("VIEW ALL EMPLOYEES");
 
-    std::vector<Employee> employees = Employee::fetchAllEmployees();
+    std::vector<Employee> employees = EmployeeManager::fetchAllEmployees();
 
     if (employees.size() == 0)
     {
-        utils::showMessage(MESSAGE_TYPE::INFO, "No employees found!");
+        utility::showMessage(utility::MESSAGE_TYPE::INFO, "No employees found!");
         std::cout << "\n\nPress any key to go back...";
-        utils::pauseScreen();
+        utility::pauseScreen();
         return;
     }
 
     std::vector<int> spaces = {7, 22, 13, 12, 13, 12, 12, 16, 9};
-    utils::showLine(spaces, {"ID", "Name", "Username", "Password", "Contact No.", "Added On", "Removed On", "Last Modified", "Status"});
+    utility::showLine(spaces, {"ID", "Name", "Username", "Password", "Contact No.", "Added On", "Removed On", "Last Modified", "Status"});
 
     for (Employee &employee : employees)
-        utils::showLine(spaces, {std::to_string(employee.getId()), employee.getName(), employee.getUsername(), employee.getPassword(), employee.getContactNumber(), utils::getDateString(employee.getAddedDate(), false), utils::getDateString(employee.getRemovedDate(), false), utils::getDateString(employee.getLastModified(), false), employee.getStatusString()});
+        utility::showLine(spaces, {std::to_string(employee.getId()), employee.getName(), employee.getUsername(), employee.getPassword(), employee.getContactNumber(), utility::getDateString(employee.getAddedDate(), false), utility::getDateString(employee.getRemovedDate(), false), utility::getDateString(employee.getLastModified(), false), employee.getStatusString()});
 
     std::cout << "\nPress any key to continue...";
-    utils::pauseScreen();
+    utility::pauseScreen();
 }
 
 // employee :: search employee by id
-void employee_view::searchById()
+void employee_interface::searchById()
 {
     int id;
     bool found = false;
     std::string id_str, choice;
 
     std::vector<Employee> employees;
-    
+
     while (true)
     {
         found = false;
 
-        employees = Employee::fetchAllEmployees(); // fetch all employees
+        employees = EmployeeManager::fetchAllEmployees(); // fetch all employees
 
-        utils::header("SEARCH EMPLOYEE BY ID");
+        utility::header("SEARCH EMPLOYEE BY ID");
         std::cout << "Enter employee ID to search :: ";
         std::getline(std::cin, id_str);
 
@@ -186,11 +185,11 @@ void employee_view::searchById()
             }
 
             if (!found)
-                utils::showMessage(MESSAGE_TYPE::INFO, "\nNo employee found with this ID.");
+                utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo employee found with this ID.");
         }
         catch (const std::invalid_argument &e)
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid input!");
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid input!");
         }
 
         std::cout << "\n\nDo you want to search another employee [y/n]? ";
@@ -202,19 +201,18 @@ void employee_view::searchById()
 }
 
 // employee :: search employee by username
-void employee_view::searchByUsername()
+void employee_interface::searchByUsername()
 {
     bool found = false;
     std::string username, choice;
-    
-    std::vector<Employee> employees = Employee::fetchAllEmployees(); // fetch all employees
-    
+    std::vector<Employee> employees;
+
     while (true)
     {
         found = false;
-        employees = Employee::fetchAllEmployees(); // fetch all employees
-        
-        utils::header("SEARCH EMPLOYEE BY USERNAME");
+        employees = EmployeeManager::fetchAllEmployees(); // fetch all employees
+
+        utility::header("SEARCH EMPLOYEE BY USERNAME");
 
         std::cout << "Enter username to search :: ";
         std::getline(std::cin, username);
@@ -230,7 +228,7 @@ void employee_view::searchByUsername()
         }
 
         if (!found)
-            utils::showMessage(MESSAGE_TYPE::INFO, "\nNo employee found with this username.");
+            utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo employee found with this username.");
 
         std::cout << "\n\nDo you want to search another employee [y/n]? ";
         std::getline(std::cin, choice);
@@ -241,7 +239,7 @@ void employee_view::searchByUsername()
 }
 
 // employee :: add new employee
-void employee_view::add()
+void employee_interface::add()
 {
     Employee employee;
 
@@ -250,14 +248,15 @@ void employee_view::add()
     std::string choice, username, password, name, contact_number;
 
     std::vector<Employee> employees;
-    
+    EmployeeManager employeeManager;
+
     while (true)
     {
         valid_username = true;
 
-        employees = Employee::fetchAllEmployees(); // fetch all employees
+        employees = EmployeeManager::fetchAllEmployees(); // fetch all employees
 
-        utils::header("ADD NEW EMPLOYEE");
+        utility::header("ADD NEW EMPLOYEE");
         std::cout << "Username          :: ";
         std::getline(std::cin, username);
 
@@ -274,7 +273,7 @@ void employee_view::add()
             break;
         else
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nThis username is already take!");
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nThis username is already take!");
             std::cout << "\n\nDo you want to try again [y/n]? ";
             std::getline(std::cin, choice);
 
@@ -298,15 +297,15 @@ void employee_view::add()
     employee.setContactNumber(contact_number);
 
     employee.setStatus(EMPLOYEE_STATUS::ACTIVE);
-    employee.setAddedDate(utils::getCurrentDateTime());
+    employee.setAddedDate(utility::getCurrentDateTime());
 
     // show employee details
-    utils::header("ADD NEW EMPLOYEE");
+    utility::header("ADD NEW EMPLOYEE");
     std::cout << "Username          :: " << employee.getUsername() << "\n";
     std::cout << "Password          :: " << employee.getPassword() << "\n";
     std::cout << "Name              :: " << employee.getName() << "\n";
     std::cout << "Contact Number    :: " << employee.getContactNumber() << "\n";
-    std::cout << "Added Date        :: " << utils::getDateString(employee.getAddedDate(), false) << "\n";
+    std::cout << "Added Date        :: " << utility::getDateString(employee.getAddedDate(), false) << "\n";
     std::cout << "Status            :: " << employee.getStatusString() << "\n";
 
     // ask user to proceed
@@ -314,35 +313,35 @@ void employee_view::add()
     std::getline(std::cin, choice);
 
     if (choice != "Y" && choice != "y")
-        utils::showMessage(MESSAGE_TYPE::INFO, "\nEmployee addition cancelled.");
+        utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nEmployee addition cancelled.");
     else
     {
-        if (employee.add())
-            utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nEmployee added successfully!");
+        if (employeeManager.add(employee))
+            utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nEmployee added successfully!");
         else
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nEmployee addition failed!");
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nEmployee addition failed!");
     }
 
     std::cout << "\n\nPress any key to continue...";
-    utils::pauseScreen();
+    utility::pauseScreen();
 }
 
 // employee :: update employee details
-void employee_view::update()
+void employee_interface::update()
 {
     int id;
     bool id_found;
-
     std::string id_str, choice;
-    Employee employee;
-
     std::vector<Employee> employees;
-    
+
+    Employee employee;
+    EmployeeManager employeeManager;
+
     while (true)
     {
-        employees = Employee::fetchAllEmployees(); // fetch all employees
-        
-        utils::header("UPDATE EMPLOYEE DETAILS");
+        employees = EmployeeManager::fetchAllEmployees(); // fetch all employees
+
+        utility::header("UPDATE EMPLOYEE DETAILS");
 
         std::cout << "Enter employee ID to update :: ";
         std::getline(std::cin, id_str);
@@ -365,7 +364,7 @@ void employee_view::update()
                 break;
             else
             {
-                utils::showMessage(MESSAGE_TYPE::FAILURE, "\nNo employee found with this ID!");
+                utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nNo employee found with this ID!");
 
                 // try again
                 std::cout << "\n\nDo you want to try again [y/n]? ";
@@ -379,11 +378,11 @@ void employee_view::update()
 
             std::cout << "\nID found :: " << std::boolalpha << id_found;
 
-            utils::pauseScreen();
+            utility::pauseScreen();
         }
         catch (const std::invalid_argument &e)
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid input!");
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid input!");
 
             std::cout << "\n\nDo you want to try again [y/n]? ";
             std::getline(std::cin, choice);
@@ -396,7 +395,7 @@ void employee_view::update()
     }
 
     // update logics starts from here
-    utils::header("UPDATE EMPLOYEE DETAILS");
+    utility::header("UPDATE EMPLOYEE DETAILS");
 
     // initial details
     std::cout << "INITIAL DETAILS";
@@ -404,9 +403,9 @@ void employee_view::update()
     std::cout << "\nPassword       :: " << employee.getPassword();
     std::cout << "\nName           :: " << employee.getName();
     std::cout << "\nContact Number :: " << employee.getContactNumber();
-    std::cout << "\nAdded on       :: " << utils::getDateString(employee.getAddedDate(), false);
-    std::cout << "\nRemoved on     :: " << utils::getDateString(employee.getLastModified(), false);
-    std::cout << "\nLast modified  :: " << utils::getDateString(employee.getRemovedDate(), false);
+    std::cout << "\nAdded on       :: " << utility::getDateString(employee.getAddedDate(), false);
+    std::cout << "\nRemoved on     :: " << utility::getDateString(employee.getLastModified(), false);
+    std::cout << "\nLast modified  :: " << utility::getDateString(employee.getRemovedDate(), false);
     std::cout << "\nStatus         :: " << employee.getStatusString();
 
     std::cout << "\n\nYou can press enter if you don't want to update the specific details...";
@@ -444,7 +443,7 @@ void employee_view::update()
         }
         else
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nThis username is already taken!");
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nThis username is already taken!");
 
             std::cout << "\n\nDo you want to try again [y/n]? ";
             std::getline(std::cin, choice);
@@ -486,14 +485,14 @@ void employee_view::update()
 
     if (!detail_modified)
     {
-        utils::showMessage(MESSAGE_TYPE::INFO, "\nNothing to update!");
+        utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNothing to update!");
         std::cout << "\n\nPress any key to go back...";
-        utils::pauseScreen();
+        utility::pauseScreen();
         return;
     }
 
     // display new details
-    utils::header("UPDATE EMPLOYEE DETAILS");
+    utility::header("UPDATE EMPLOYEE DETAILS");
     std::cout << "NEW DETAILS";
     std::cout << "\n\nUsername       :: " << employee.getUsername();
     std::cout << "\nPassword       :: " << employee.getPassword();
@@ -505,44 +504,45 @@ void employee_view::update()
 
     if (choice != "Y" && choice != "y")
     {
-        utils::showMessage(MESSAGE_TYPE::INFO, "\nEmployee updation cancelled!");
+        utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nEmployee updation cancelled!");
         std::cout << "\n\nPress any key to continue...";
-        utils::pauseScreen();
+        utility::pauseScreen();
         return;
     }
 
-    employee.setModifiedDate(utils::getCurrentDateTime()); // update modified date
+    employee.setModifiedDate(utility::getCurrentDateTime()); // update modified date
 
-    bool response = employee.update();
+    bool response = employeeManager.update(employee);
 
     if (response)
-        utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nEmployee updated successfully!");
+        utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nEmployee updated successfully!");
     else
-        utils::showMessage(MESSAGE_TYPE::FAILURE, "\nEmployee updation failed!");
+        utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nEmployee updation failed!");
 
     std::cout << "\n\nPress any key to continue...";
-    utils::pauseScreen();
+
+    utility::pauseScreen();
 }
 
 // employee :: remove employee
-void employee_view::remove()
+void employee_interface::remove()
 {
     int id;
     bool id_found, valid_id, already_removed;
     std::string id_str, choice;
-    
+
     Employee employee;
     std::vector<Employee> employees;
-    
+
     while (true)
     {
         valid_id = false;
         id_found = false;
         already_removed = false;
 
-        employees = Employee::fetchAllEmployees(); // fetch all employees
+        employees = EmployeeManager::fetchAllEmployees(); // fetch all employees
 
-        utils::header("REMOVE EMPLOYEE");
+        utility::header("REMOVE EMPLOYEE");
 
         std::cout << "Enter employee ID to remove :: ";
         std::getline(std::cin, id_str);
@@ -555,7 +555,7 @@ void employee_view::remove()
         }
         catch (const std::invalid_argument &e)
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid input!");
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid input!");
         }
 
         if (valid_id) // valid employee id
@@ -577,7 +577,7 @@ void employee_view::remove()
             }
 
             if (!id_found)
-                utils::showMessage(MESSAGE_TYPE::INFO, "\nEmployee with this ID not found!");
+                utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nEmployee with this ID not found!");
             else
             {
                 // preview employee details
@@ -585,28 +585,29 @@ void employee_view::remove()
                 std::cout << "\n\nUsername        :: " << employee.getUsername();
                 std::cout << "\nName            :: " << employee.getName();
                 std::cout << "\nContact Number  :: " << employee.getContactNumber();
-                std::cout << "\nAdded On        :: " << utils::getDateString(employee.getAddedDate(), false);
-                std::cout << "\nRemoved On      :: " << utils::getDateString(employee.getRemovedDate(), false);
-                std::cout << "\nLast Modified   :: " << utils::getDateString(employee.getLastModified(), false);
+                std::cout << "\nAdded On        :: " << utility::getDateString(employee.getAddedDate(), false);
+                std::cout << "\nRemoved On      :: " << utility::getDateString(employee.getRemovedDate(), false);
+                std::cout << "\nLast Modified   :: " << utility::getDateString(employee.getLastModified(), false);
                 std::cout << "\nStatus          :: " << employee.getStatusString();
 
                 // check if employee is already removed
                 if (already_removed)
-                    utils::showMessage(MESSAGE_TYPE::INFO, "\n\nThis employee is already removed!");
+                    utility::showMessage(utility::MESSAGE_TYPE::INFO, "\n\nThis employee is already removed!");
                 else
                 {
                     std::cout << "\n\nAre you sure you want to remove this employee [y/n]? ";
                     std::getline(std::cin, choice);
 
                     if (choice != "y" && choice != "Y")
-                        utils::showMessage(MESSAGE_TYPE::INFO, "\nEmployee removal cancelled!");
+                        utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nEmployee removal cancelled!");
                     else
                     {
                         // remove employee
-                        if (employee_utility::remove(id))
-                            utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nEmployee removed successfully!");
+                        EmployeeManager employeeManager;
+                        if (employeeManager.remove(id))
+                            utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nEmployee removed successfully!");
                         else
-                            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nCouldn't remove employee!");
+                            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nCouldn't remove employee!");
                     }
                 }
             }
@@ -619,5 +620,3 @@ void employee_view::remove()
             return;
     }
 }
-
-#endif

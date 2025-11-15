@@ -1,6 +1,9 @@
 # ignore output folder
 **/output/
 
+# ignore build folder
+**/build/
+
 # ignore executable files
 *.exe
 

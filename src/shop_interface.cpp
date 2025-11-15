@@ -1,24 +1,12 @@
-#include <iostream>
-
-// import user-defined header files
-#include "shop_class.h"
-#include "shop_utility.h"
-
-#ifndef SHOPMASTER_SHOP_VIEW_H
-#define SHOPMASTER_SHOP_VIEW_H
-
-// namespace :: shop
-namespace shop_view
-{
-    void menu();         // my shop menu
-    bool registration(); // register shop
-    void update(Shop &); // update shop
-}
+// include header file
+#include "../include/shop_interface.h"
 
 // menu
-void shop_view::menu()
+void shop_interface::menu()
 {
     Shop shop;
+    ShopManager shopManager;
+
     bool response;
     std::string choice;
 
@@ -29,15 +17,15 @@ void shop_view::menu()
 
     while (true)
     {
-        response = shop.fetch(); // fetch shop details
+        response = shopManager.fetch(shop); // fetch shop details
 
-        utils::header("MY SHOP");
+        utility::header("MY SHOP");
 
         if (!response)
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "Couldn't fetch shop details!");
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "Couldn't fetch shop details!");
             std::cout << "\n\nPress any key to go back...";
-            utils::pauseScreen();
+            utility::pauseScreen();
             return;
         }
 
@@ -48,38 +36,38 @@ void shop_view::menu()
         std::cout << "Address         :: " << shop.getAddress() << "\n\n";
 
         for (const auto &option : options)
-            utils::showOption(option.first, option.second);
+            utility::showOption(option.first, option.second);
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
-            shop_view::update(shop);
+            shop_interface::update(shop);
         else if (choice == "2")
             return;
         else
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
-            utils::pauseScreen();
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
+            utility::pauseScreen();
         }
     }
 }
 
 // registration
-bool shop_view::registration()
+bool shop_interface::registration()
 {
-    Shop shop;
-
-    bool status = false;
-
     int ward;
+    bool status = false;
     std::string name, pan, contact_number, currency, district, municipality, tole_village;
+
+    Shop shop;
+    ShopManager shopManager;
 
     while (true)
     {
-        utils::clearScreen();
-        utils::header("SHOP REGISTRATION");
-        utils::showMessage(MESSAGE_TYPE::INFO, "Shop has not been registered yet!");
+        utility::clearScreen();
+        utility::header("SHOP REGISTRATION");
+        utility::showMessage(utility::MESSAGE_TYPE::INFO, "Shop has not been registered yet!");
 
         std::cout << "\n\nName                   :: ";
         std::getline(std::cin, name);
@@ -115,7 +103,7 @@ bool shop_view::registration()
             {
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid input!\n");
+                utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid input!\n");
             }
             else
             {
@@ -127,7 +115,7 @@ bool shop_view::registration()
         shop.setAddress(district, municipality, tole_village, ward);
 
         // show shop details
-        utils::header("SHOP REGISTRATION");
+        utility::header("SHOP REGISTRATION");
         std::cout << "SHOP DETAILS\n\n";
 
         std::cout << "Name           :: " << shop.getName() << "\n";
@@ -136,16 +124,16 @@ bool shop_view::registration()
         std::cout << "Currency       :: " << shop.getCurrency() << "\n";
         std::cout << "Address        :: " << shop.getAddress() << "\n";
 
-        status = shop.registration();
+        status = shopManager.registration(shop);
 
         if (status)
         {
-            utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nShop registered successfully!");
+            utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nShop registered successfully!");
             break;
         }
         else
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nShop registration failed!");
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nShop registration failed!");
 
             std::string choice;
 
@@ -156,25 +144,25 @@ bool shop_view::registration()
                 break;
         }
 
-        utils::pauseScreen();
+        utility::pauseScreen();
     }
 
     return status;
 }
 
 // update
-void shop_view::update(Shop &shop)
+void shop_interface::update(Shop &shop)
 {
     int ward;
     bool details_changed = false;
-
     std::string choice;
-    Shop new_shop;
     std::string name, pan, contact_number, currency, district, municipality, tole_village, ward_str;
 
-    utils::header("UPDATE SHOP DETAILS");
+    Shop new_shop;
+    ShopManager shopManager;
 
-    utils::showMessage(MESSAGE_TYPE::INFO, "You can press enter key to skip the detail that you don't want to update.");
+    utility::header("UPDATE SHOP DETAILS");
+    utility::showMessage(utility::MESSAGE_TYPE::INFO, "You can press enter key to skip the detail that you don't want to update.");
 
     // get new details
     std::cout << "\n\nName                   :: ";
@@ -272,14 +260,14 @@ void shop_view::update(Shop &shop)
 
     if (!details_changed)
     {
-        utils::showMessage(MESSAGE_TYPE::INFO, "\nNothing to update...");
+        utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNothing to update...");
         std::cout << "\n\nPress any key to go back...";
-        utils::pauseScreen();
+        utility::pauseScreen();
         return;
     }
 
     // show new details
-    utils::header("UPDATE SHOP DETAILS :: NEW DETAILS");
+    utility::header("UPDATE SHOP DETAILS :: NEW DETAILS");
     std::cout << "Name             :: " << shop.getName() << "\n";
     std::cout << "PAN              :: " << shop.getPan() << "\n";
     std::cout << "Currency         :: " << shop.getCurrency() << "\n";
@@ -291,21 +279,19 @@ void shop_view::update(Shop &shop)
 
     if (choice != "Y" && choice != "y")
     {
-        utils::showMessage(MESSAGE_TYPE::INFO, "\nShop details updation cancelled.");
+        utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nShop details updation cancelled.");
         std::cout << "\n\nPress any key to go back...";
-        utils::pauseScreen();
+        utility::pauseScreen();
         return;
     }
 
     // update details
-    if (shop.update())
-        utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nShop updated successfully!");
+    if (shopManager.update(shop))
+        utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nShop updated successfully!");
     else
-        utils::showMessage(MESSAGE_TYPE::FAILURE, "\nShop updation failed!");
+        utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nShop updation failed!");
 
     std::cout << "\n\nPress any key to continue...";
 
-    utils::pauseScreen();
+    utility::pauseScreen();
 }
-
-#endif

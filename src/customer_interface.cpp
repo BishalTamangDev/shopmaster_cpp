@@ -1,23 +1,8 @@
-#include <iostream>
+// include header file
+#include "../include/customer_interface.h"
 
-// import user-defined header file
-#include "customer_class.h"
-
-#ifndef SHOPMASTER_CUSTOMER_VIEW_H
-#define SHOPMASTER_CUSTOMER_VIEW_H
-
-// namespace :: customer
-namespace customer_view
-{
-    void adminMenu();       // menu
-    void viewAll();         // view all customer
-    void searchBySalesId(); // search by sales id
-    void searchByName();    // search by name
-};
-
-// section :: customer
-// customer :: menu
-void customer_view::adminMenu()
+// admin menu
+void customer_interface::adminMenu()
 {
     std::string choice;
 
@@ -30,71 +15,71 @@ void customer_view::adminMenu()
 
     while (true)
     {
-        utils::header("CUSTOMER view MENU");
+        utility::header("CUSTOMER MANAGEMENT MENU");
 
         for (const auto &option : options)
-            utils::showOption(option.first, option.second);
+            utility::showOption(option.first, option.second);
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
-            customer_view::viewAll();
+            customer_interface::viewAll();
         else if (choice == "2")
-            customer_view::searchBySalesId();
+            customer_interface::searchBySalesId();
         else if (choice == "3")
-            customer_view::searchByName();
+            customer_interface::searchByName();
         else if (choice == "4")
             return;
         else
         {
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
-            utils::pauseScreen();
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
+            utility::pauseScreen();
         }
     }
 }
 
 // view all customer
-void customer_view::viewAll()
+void customer_interface::viewAll()
 {
-    utils::header("ALL CUSTOMERS");
+    utility::header("ALL CUSTOMERS");
 
-    std::vector<Customer> customers = Customer::fetchAllCustomers();
+    std::vector<Customer> customers = CustomerManager::fetchAllCustomers();
 
     if (customers.size() == 0)
-        utils::showMessage(MESSAGE_TYPE::INFO, "No customers found!\n");
+        utility::showMessage(utility::MESSAGE_TYPE::INFO, "No customers found!\n");
     else
     {
-        utils::showLine({11, 25}, {"Sales ID", "Name"});
+        utility::showLine({11, 25}, {"Sales ID", "Name"});
         for (Customer customer : customers)
-            utils::showLine({11, 25}, {std::to_string(customer.getSalesId()), customer.getName()});
+            utility::showLine({11, 25}, {std::to_string(customer.getSalesId()), customer.getName()});
     }
 
     std::cout << "\nPress any key to continue...";
-    utils::pauseScreen();
+    utility::pauseScreen();
 }
 
-// search by sales id
-void customer_view::searchBySalesId()
+// search customer by sales id
+void customer_interface::searchBySalesId()
 {
     int sales_id;
     bool found, valid_id;
     std::string sales_id_str, choice;
 
-    std::vector<Customer> customers = Customer::fetchAllCustomers();
+    std::vector<Customer> customers = CustomerManager::fetchAllCustomers();
 
     while (true)
     {
         found = false;
         valid_id = true;
 
-        utils::header("SEARCH CUSTOMER BY SALES ID");
+        utility::header("SEARCH CUSTOMER BY SALES ID");
 
         if (customers.size() == 0)
         {
-            utils::showMessage(MESSAGE_TYPE::INFO, "No customers found!");
+            utility::showMessage(utility::MESSAGE_TYPE::INFO, "No customers found!");
             std::cout << "\n\nPress any key to continue...";
-            utils::pauseScreen();
+            utility::pauseScreen();
             break;
         }
 
@@ -108,7 +93,7 @@ void customer_view::searchBySalesId()
         catch (const std::invalid_argument &e)
         {
             valid_id = false;
-            utils::showMessage(MESSAGE_TYPE::FAILURE, "\nInvalid input");
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid input");
         }
 
         if (valid_id) // search
@@ -118,7 +103,7 @@ void customer_view::searchBySalesId()
                 if (customer.getSalesId() == sales_id)
                 {
                     found = true;
-                    utils::showMessage(MESSAGE_TYPE::SUCCESS, "\nCustomer found!");
+                    utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nCustomer found!");
                     std::cout << "\n\nSales ID     :: " << sales_id;
                     std::cout << "\n\nName         :: " << customer.getName();
                     break;
@@ -126,7 +111,7 @@ void customer_view::searchBySalesId()
             }
 
             if (!found)
-                utils::showMessage(MESSAGE_TYPE::INFO, "\nCustomer not found!");
+                utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nCustomer not found!");
         }
 
         std::cout << "\n\nDo you want to search another customer [y/n]? ";
@@ -137,23 +122,23 @@ void customer_view::searchBySalesId()
     }
 }
 
-// search by name
-void customer_view::searchByName()
+// search customer by name
+void customer_interface::searchByName()
 {
     bool found;
     std::string name, target_name, choice;
 
-    std::vector<Customer> customers = Customer::fetchAllCustomers();
+    std::vector<Customer> customers = CustomerManager::fetchAllCustomers();
 
     while (true)
     {
         found = false;
 
-        utils::header("SEARCH CUSTOMER BY NAME");
+        utility::header("SEARCH CUSTOMER BY NAME");
 
         if (customers.size() == 0)
         {
-            utils::showMessage(MESSAGE_TYPE::INFO, "No customers found!\n");
+            utility::showMessage(utility::MESSAGE_TYPE::INFO, "No customers found!\n");
             std::cout << "\n\nPress any key to continue...";
             break;
         }
@@ -162,23 +147,23 @@ void customer_view::searchByName()
         std::getline(std::cin, target_name);
 
         std::cout << "\n";
-        utils::showLine({11, 25}, {"Sales ID", "Name"});
+        utility::showLine({11, 25}, {"Sales ID", "Name"});
 
         for (Customer &customer : customers)
         {
             name = customer.getName();
-            utils::convertToLowerCase(name);
-            utils::convertToLowerCase(target_name);
+            utility::convertToLowerCase(name);
+            utility::convertToLowerCase(target_name);
 
             if (name.find(target_name) != std::string::npos)
             {
                 found = true;
-                utils::showLine({11, 25}, {std::to_string(customer.getSalesId()), customer.getName()});
+                utility::showLine({11, 25}, {std::to_string(customer.getSalesId()), customer.getName()});
             }
         }
 
         if (!found)
-            utils::showMessage(MESSAGE_TYPE::INFO, "\nCustomer not found!\n");
+            utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nCustomer not found!\n");
 
         std::cout << "\nDo you want to search another customer [y/n]? ";
         std::getline(std::cin, choice);
@@ -187,5 +172,3 @@ void customer_view::searchByName()
             break;
     }
 }
-
-#endif
