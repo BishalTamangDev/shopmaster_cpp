@@ -16,11 +16,30 @@ bool CustomerManager::addCustomer(Customer customer)
     return status;
 }
 
-// fetch all customers
+// static :: get customer name
+std::string CustomerManager::getCustomerName(int sales_id)
+{
+    std::string name = "Unknown";
+
+    std::vector<Customer> customers = CustomerManager::fetchAllCustomers();
+
+    for (Customer customer : customers)
+    {
+        if (customer.getSalesId() == sales_id)
+        {
+            name = customer.getName();
+            break;
+        }
+    }
+
+    return name;
+}
+
+// static :: fetch all customers
 std::vector<Customer> CustomerManager::fetchAllCustomers()
 {
     Customer customer;
-    
+
     std::string line;
     std::vector<Customer> customers;
 
@@ -30,8 +49,10 @@ std::vector<Customer> CustomerManager::fetchAllCustomers()
 
     while (std::getline(fin, line))
     {
-        customer.setByLineData(utility::getLineData(line));
-        customers.push_back(customer);
+        bool status = customer.setByLineData(utility::getLineData(line));
+
+        if (status)
+            customers.push_back(customer);
     }
 
     fin.close();

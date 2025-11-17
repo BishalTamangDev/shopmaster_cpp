@@ -8,12 +8,6 @@ void Sales::setSalesId(int id)
     this->sales_id = id;
 }
 
-// setter :: customer id
-void Sales::setCustomerId(int customer_id)
-{
-    this->customer_id = customer_id;
-}
-
 // setter :: employee id
 void Sales::setEmployeeId(int employee_id)
 {
@@ -59,17 +53,16 @@ void Sales::setDate(std::array<int, 6> date)
 // setter :: using line data
 bool Sales::setByLineData(std::vector<std::any> data)
 {
-    try 
+    try
     {
         sales_id = std::stoi(std::any_cast<std::string>(data[0]));
-        customer_id = std::stoi(std::any_cast<std::string>(data[0]));
-        employee_id = std::stoi(std::any_cast<std::string>(data[0]));
-        net_amount = std::stod(std::any_cast<std::string>(data[0]));
-        discount = std::stod(std::any_cast<std::string>(data[0]));
-        gross_amount = std::stod(std::any_cast<std::string>(data[0]));
-        tender = std::stod(std::any_cast<std::string>(data[0]));
-        change = std::stod(std::any_cast<std::string>(data[0]));
-        date = utility::getDateFromString(std::any_cast<std::string>(data[0]));
+        employee_id = std::stoi(std::any_cast<std::string>(data[1]));
+        net_amount = std::stod(std::any_cast<std::string>(data[2]));
+        discount = std::stod(std::any_cast<std::string>(data[3]));
+        gross_amount = std::stod(std::any_cast<std::string>(data[4]));
+        tender = std::stod(std::any_cast<std::string>(data[5]));
+        change = std::stod(std::any_cast<std::string>(data[6]));
+        date = utility::getDateFromString(std::any_cast<std::string>(data[7]));
         return true;
     }
     catch (const std::invalid_argument &e)
@@ -78,18 +71,11 @@ bool Sales::setByLineData(std::vector<std::any> data)
     }
 }
 
-
 // getters
 // getter :: sales id
 int Sales::getSalesId() const
 {
     return this->sales_id;
-}
-
-// getter :: customer id
-int Sales::getCustomerId() const
-{
-    return this->customer_id;
 }
 
 // getter :: employee id

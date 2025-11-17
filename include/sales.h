@@ -6,7 +6,7 @@
 class Sales
 {
 private:
-    int sales_id, customer_id, employee_id;
+    int sales_id, employee_id;
     double net_amount, discount, gross_amount, tender, change;
     std::array<int, 6> date;
 
@@ -15,7 +15,6 @@ public:
     Sales()
     {
         sales_id = 0;
-        customer_id = 0;
         employee_id = 0;
         net_amount = 0.0;
         discount = 0.0;
@@ -27,7 +26,6 @@ public:
 
     // setters
     void setSalesId(int);
-    void setCustomerId(int);
     void setEmployeeId(int);
     void setNetAmount(double);
     void setDiscount(double);
@@ -39,7 +37,6 @@ public:
 
     // getters
     int getSalesId() const;
-    int getCustomerId() const;
     int getEmployeeId() const;
     double getNetAmount() const;
     double getDiscount() const;

@@ -18,5 +18,5 @@ public:
 
     static std::vector<Product> fetchAllProducts();                    // fetch all products
     static std::vector<Product> fetchProductsByStatus(PRODUCT_STATUS); // fetch products by status
-    static std::vector<Product> fetchSoldProductsBySalesId(int);          // fetch sold products by sales id
+    static std::vector<Product> fetchSoldProductsBySalesId(int);       // fetch sold products by sales id
 };

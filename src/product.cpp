@@ -154,7 +154,7 @@ void Product::view()
 {
     std::cout << "ID             :: " << this->getId();
     std::cout << "\nName           :: " << this->getName();
-    std::cout << "\nRate           :: " << this->getRate();
+    std::cout << "\nRate           :: " << ShopManager::getCurrency() << utility::getFormattedDouble(this->getRate());
     std::cout << "\nQuantity       :: " << this->getQuantity();
     std::cout << "\nAdded On       :: " << utility::getDateString(this->getAddedDate(), false);
     std::cout << "\nRemoved On     :: " << utility::getDateString(this->getRemovedDate(), false);

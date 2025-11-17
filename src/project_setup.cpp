@@ -64,7 +64,6 @@ std::map<std::string, std::vector<std::string>> project_setup::headlines = {
         filenames["sales"],
         {
             "Sales ID",
-            "Customer ID",
             "Employee ID",
             "Net Amount",
             "Discount",

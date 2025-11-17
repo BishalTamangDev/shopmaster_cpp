@@ -114,27 +114,47 @@ bool admin_interface::login()
 // update name
 void admin_interface::updateName(Admin admin)
 {
+    std::string new_name, old_name, choice;
+
     AdminManager adminManager;
 
-    utility::header("UPDATE NAME");
-    std::string name;
+    while (true)
+    {
+        utility::header("UPDATE NAME");
 
-    std::cout << "Old name    :: " << admin.getName();
+        old_name = admin.getName();
 
-    std::cout << "\n\nNew Name    :: ";
-    std::getline(std::cin, name);
-    admin.setName(name);
+        std::cout << "Old name    :: " << old_name;
 
-    std::cout << "\nNew name :: " << admin.getName();
+        std::cout << "\n\nNew Name    :: ";
+        std::getline(std::cin, new_name);
 
-    if (adminManager.update(admin))
-        utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\n\nName updated successfully!");
-    else
-        utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\n\nName updation failed!");
+        utility::convertToLowerCase(new_name);
+        utility::convertToLowerCase(old_name);
 
-    std::cout << "\n\nPress any key to continue...";
+        if (new_name == old_name)
+            utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nYou entered old name!");
+        else
+        {
+            admin.setName(new_name);
 
-    utility::pauseScreen();
+            if (!adminManager.update(admin))
+                utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nName updation failed!");
+            else
+            {
+                utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nName updated successfully!");
+                std::cout << "\n\nPress any key to continue...";
+                utility::pauseScreen();
+                break;
+            }
+        }
+
+        std::cout << "\n\nDo you want to try again [y/n]? ";
+        std::getline(std::cin, choice);
+
+        if (choice != "Y" && choice != "y")
+            break;
+    }
 }
 
 // update username
@@ -147,8 +167,6 @@ void admin_interface::updateUsername(Admin admin)
 
     while (true)
     {
-        utility::clearScreen();
-
         utility::header("UPDATE USERNAME");
 
         std::cout << "Old username       :: " << admin.getUsername() << "\n\n";
@@ -157,48 +175,45 @@ void admin_interface::updateUsername(Admin admin)
         std::getline(std::cin, new_username);
 
         if (new_username == admin.getUsername())
+            utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nYou entered old username!");
+        else
         {
-            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nYou entered old username!");
+            std::cout << "\nNew username       :: " << new_username;
 
-            std::cout << "\n\nDo you want to try again [y/n]? ";
-            std::getline(std::cin, choice);
+            admin.setUsername(new_username); // set new username
 
-            if (choice != "Y" && choice != "y")
-                break;
+            // proceed update
+            if (!adminManager.update(admin))
+                utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\n\nUsername updation failed!");
             else
-                continue;
+            {
+                utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\n\nUsername updated successfully!");
+                std::cout << "\n\nPress any key to continue...";
+                utility::pauseScreen();
+                break;
+            }
         }
 
-        std::cout << "\nNew username       :: " << new_username;
+        std::cout << "\n\nDo you want to try again [y/n]? ";
+        std::getline(std::cin, choice);
 
-        admin.setUsername(new_username); // set new username
-
-        // proceed update
-        if (adminManager.update(admin))
-            utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\n\nUsername updated successfully!");
+        if (choice != "Y" && choice != "y")
+            break;
         else
-            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\n\nUsername updation failed!");
-
-        std::cout << "\n\nPress any key to continue...";
-
-        utility::pauseScreen();
-
-        break;
+            continue;
     }
 }
 
 // update password
 void admin_interface::updatePassword(Admin admin)
 {
+    AdminManager adminManager;
+
     std::string choice;
     std::string old_password, new_password, new_password_confirmation;
 
-    AdminManager adminManager;
-
     while (true)
     {
-        utility::clearScreen();
-
         utility::header("UPDATE PASSWORD");
 
         // get old password
@@ -206,52 +221,43 @@ void admin_interface::updatePassword(Admin admin)
         std::getline(std::cin, old_password);
 
         if (old_password != admin.getPassword())
-        {
-            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid password!");
-
-            std::cout << "\n\nDo you want to try again [y/n]? ";
-            std::getline(std::cin, choice);
-
-            if (choice != "Y" && choice != "y")
-                break;
-            else
-                continue;
-        }
-
-        std::cout << "\nEnter new password :: ";
-        std::getline(std::cin, new_password);
-
-        if (new_password == admin.getPassword())
-        {
-            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nYou entered old password!");
-            std::cout << "\n\nPress any key to go back...";
-            utility::pauseScreen();
-            break;
-        }
-
-        std::cout << "\nEnter again for confirmation :: ";
-        std::getline(std::cin, new_password_confirmation);
-
-        if (new_password != new_password_confirmation)
-        {
-            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nPassword confirmation failed!");
-            std::cout << "\n\nPress any key to go back...";
-            utility::pauseScreen();
-            break;
-        }
-
-        admin.setPassword(new_password); // set new password
-
-        // proceed update
-        if (adminManager.update(admin))
-            utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nPassword updated successfully!");
+            utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nInvalid password!");
         else
-            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nPassword updation failed!");
+        {
+            std::cout << "\nEnter new password :: ";
+            std::getline(std::cin, new_password);
 
-        std::cout << "\n\nPress any key to continue...";
+            if (new_password == admin.getPassword())
+                utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nYou entered old password!");
+            else
+            {
+                std::cout << "\nEnter again for confirmation :: ";
+                std::getline(std::cin, new_password_confirmation);
 
-        utility::pauseScreen();
+                if (new_password != new_password_confirmation)
+                    utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nPassword confirmation failed!");
+                else
+                {
+                    admin.setPassword(new_password); // set new password
 
-        break;
+                    // proceed update
+                    if (!adminManager.update(admin))
+                        utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nPassword updation failed!");
+                    else
+                    {
+                        utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nPassword updated successfully!");
+                        std::cout << "\n\nPress any key to continue...";
+                        utility::pauseScreen();
+                        break;
+                    }
+                }
+            }
+        }
+
+        std::cout << "\n\nDo you want to try again [y/n]? ";
+        std::getline(std::cin, choice);
+
+        if (choice != "Y" && choice != "y")
+            break;
     }
 }

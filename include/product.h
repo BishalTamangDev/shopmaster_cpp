@@ -2,6 +2,7 @@
 
 // include header file
 #include "project_setup.h"
+#include "shop_manager.h"
 
 // product status
 enum class PRODUCT_STATUS

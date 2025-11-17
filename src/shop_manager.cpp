@@ -5,7 +5,7 @@
 bool ShopManager::registrationStatus()
 {
     Shop shop;
-    
+
     std::string line;
     std::vector<std::any> data;
     std::ifstream file(project_setup::filenames["shop"]);
@@ -14,9 +14,9 @@ bool ShopManager::registrationStatus()
     std::getline(file, line); // shop data
     file.close();
 
-    if(line.empty())
+    if (line.empty())
         return false;
-    else 
+    else
     {
         return shop.setByLineData(utility::getLineData(line));
     }
@@ -71,11 +71,20 @@ bool ShopManager::update(Shop shop)
     // write new data
     file.open(project_setup::filenames["shop"], std::ios::out);
     file << headline << "\n";
-    file << shop.getName() << "," << shop.getPan() << "," << shop.getAddress() << "," << shop.getCurrency() << "," << shop.getDistrict() << "," << shop.getMunicipality() << "," << shop.getToleVillage() << "," << shop.getWard() << "\n";
+    file << shop.getName() << "," << shop.getPan() << "," << shop.getContactNumber() << "," << shop.getCurrency() << "," << shop.getDistrict() << "," << shop.getMunicipality() << "," << shop.getToleVillage() << "," << shop.getWard() << "\n";
 
     bool status = file.good();
 
     file.close();
 
     return status;
+}
+
+// get currency
+std::string ShopManager::getCurrency()
+{
+    Shop shop;
+    ShopManager shopManager;
+
+    return shopManager.fetch(shop) ? shop.getCurrency() + ". " : "";
 }

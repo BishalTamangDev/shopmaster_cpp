@@ -179,6 +179,25 @@ bool EmployeeManager::login(std::string username, std::string password, int &cur
     return status;
 }
 
+// get employee name
+std::string EmployeeManager::getEmployeeName(int id)
+{
+    std::string name = "Unknown";
+
+    auto employees = fetchAllEmployees();
+
+    for(Employee employee : employees)
+    {
+        if(employee.getId() == id)
+        {
+            name = employee.getName();
+            break;
+        }
+    }
+
+    return name;
+}
+
 // fetch all employees
 std::vector<Employee> EmployeeManager::fetchAllEmployees()
 {

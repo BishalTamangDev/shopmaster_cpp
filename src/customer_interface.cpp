@@ -138,8 +138,9 @@ void customer_interface::searchByName()
 
         if (customers.size() == 0)
         {
-            utility::showMessage(utility::MESSAGE_TYPE::INFO, "No customers found!\n");
+            utility::showMessage(utility::MESSAGE_TYPE::INFO, "No customers found!");
             std::cout << "\n\nPress any key to continue...";
+            utility::pauseScreen();
             break;
         }
 

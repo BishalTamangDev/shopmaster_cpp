@@ -1,4 +1,4 @@
-// import header file
+// include header file
 #include "../include/utility.h"
 
 // variables
@@ -63,7 +63,8 @@ void utility::showMessage(MESSAGE_TYPE type, std::string message)
 // show options
 void utility::showOption(int serial, std::string title)
 {
-    std::cout << std::left << std::setw(47) << title << "[" << serial << "]\n";
+    std::string serial_str = "[" + std::to_string(serial) + "]";
+    std::cout << serial_str << " " << title << "\n";
 }
 
 // get line data
@@ -140,6 +141,15 @@ std::string utility::getDateString(std::array<int, 6> date, bool adding)
         return date_string;
     }
 }
+
+// get formatted double as string
+std::string utility::getFormattedDouble(double dbl)
+{
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(2) << dbl;
+    return oss.str();
+}
+
 
 // get date from string
 std::array<int, 6> utility::getDateFromString(std::string str)

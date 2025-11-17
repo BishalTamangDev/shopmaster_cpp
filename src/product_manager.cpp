@@ -291,7 +291,7 @@ std::vector<Product> fetchSoldProductsBySalesId(int)
 {
     Product product;
     std::vector<Product> sold_products;
-    
+
     std::string line;
     std::vector<std::any> data;
 
@@ -299,7 +299,7 @@ std::vector<Product> fetchSoldProductsBySalesId(int)
 
     std::getline(fin, line);
 
-    while(std::getline(fin, line))
+    while (std::getline(fin, line))
     {
         data = utility::getLineData(line);
         product.setByLineData(data);
@@ -310,4 +310,3 @@ std::vector<Product> fetchSoldProductsBySalesId(int)
 
     return sold_products;
 }
-

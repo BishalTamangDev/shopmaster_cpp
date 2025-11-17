@@ -13,52 +13,73 @@ bool SalesManager::add()
 int SalesManager::generateId()
 {
     int id = 1;
-
     return id;
 }
 
 // get sales by sales id
-Sales SalesManager::getSalesById(int sales_id)
+bool SalesManager::fetchSalesReportById(int sales_id, Sales &sales)
 {
-    Sales sales;
+    bool found = false;
 
-    std::cout << "Sales ID :: " << sales_id << "\n";
+    std::vector<Sales> all_sales = SalesManager::fetchSalesReports(0, 0, 0);
 
-    return sales;
+    for (Sales temp : all_sales)
+    {
+        if (temp.getSalesId() == sales_id)
+        {
+            sales = temp;
+            found = true;
+            break;
+        }
+    }
+
+    return found;
 }
 
-// get sales by customer name
-std::vector<Sales> SalesManager::getSalesByCustomerName(std::string)
+// fetch sales by customer name
+std::vector<Sales> SalesManager::fetchSalesReportsByCustomerName(std::string target_name)
 {
-    return std::vector<Sales>();
-}
+    std::string name;
 
-// get daily sales report
-std::vector<Sales> SalesManager::getDailySalesReport(int, int, int)
-{
-    return std::vector<Sales>();
-}
+    std::vector<Sales> list;
+    std::vector<Sales> all_sales = SalesManager::fetchSalesReports(0, 0, 0);
 
-// get monthly sales report
-std::vector<Sales> SalesManager::getMonthlySalesReport(int, int)
-{
-    return std::vector<Sales>();
-}
+    std::vector<Customer> all_customers = CustomerManager::fetchAllCustomers();
 
-// get annually sales report
-std::vector<Sales> SalesManager::getAnnuallySalesReport(int)
-{
-    return std::vector<Sales>();
+    utility::convertToLowerCase(target_name); // convert targeted customer name into lowercase
+
+    for (Sales sales : all_sales)
+    {
+        for (Customer customer : all_customers)
+        {
+            if (customer.getSalesId() == sales.getSalesId())
+            {
+                name = customer.getName();
+                utility::convertToLowerCase(name); // convert customer name into lowercase
+
+                if (name.find(target_name) != std::string::npos)
+                {
+                    list.push_back(sales);
+                    break;
+                }
+            }
+        }
+    }
+
+    return list;
 }
 
 // get all sales report
-std::vector<Sales> SalesManager::getAllSales()
+std::vector<Sales> SalesManager::fetchSalesReports(int year, int month, int day)
 {
     Sales sale;
-    std::vector<Sales> sales = {};
 
-    std::string line;
+    bool status;
+
+    std::string line, sales_type;
     std::vector<std::any> data;
+
+    std::vector<Sales> sales = {};
 
     std::ifstream fin(project_setup::filenames["sales"]);
 
@@ -67,8 +88,31 @@ std::vector<Sales> SalesManager::getAllSales()
     while (std::getline(fin, line))
     {
         data = utility::getLineData(line);
-        sale.setByLineData(data);
-        sales.push_back(sale);
+
+        status = sale.setByLineData(data);
+
+        if (status)
+        {
+            if (year != 0 && month == 0 && day == 0)
+            {
+                if (sale.getDate()[0] == year)
+                    sales.push_back(sale);
+            }
+            else if (year != 0 && month != 0 && day == 0)
+            {
+                if (sale.getDate()[0] == year && sale.getDate()[1] == month)
+                    sales.push_back(sale);
+            }
+            else if (year != 0 && month != 0 && day != 0)
+            {
+                if (sale.getDate()[0] == year && sale.getDate()[1] == month && sale.getDate()[2] == day)
+                sales.push_back(sale);
+            }
+            else if (year == 0 && month == 0 && day == 0)
+            {
+                sales.push_back(sale);
+            }
+        }
     }
 
     fin.close();
