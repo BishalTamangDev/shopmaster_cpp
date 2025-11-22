@@ -19,6 +19,7 @@ class Product
 private:
     int id;
     int quantity;
+    int sales_id;
     double rate;
     std::string name;
     std::array<int, 6> added_date;
@@ -32,6 +33,7 @@ public:
     {
         id = 0;
         quantity = 0;
+        sales_id = 0;
         rate = 0.0;
         name = "";
         added_date = {0, 0, 0, 0, 0, 0};
@@ -58,6 +60,7 @@ public:
     void setName(std::string);
     void setRate(double);
     void setQuantity(int);
+    void setSalesId(int);
     void setAddedDate(std::array<int, 6>);
     void setRemovedDate(std::array<int, 6>);
     void setLastModifiedDate(std::array<int, 6>);
@@ -68,6 +71,7 @@ public:
     // getters
     int getId() const;
     int getQuantity() const;
+    int getSalesId() const;
     double getRate() const;
     std::string getName() const;
     std::array<int, 6> getAddedDate() const;

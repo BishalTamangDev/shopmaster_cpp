@@ -253,6 +253,75 @@ int ProductManager::getValidId()
     return id;
 }
 
+// sell product
+bool ProductManager::sellProduct(std::vector<Product> cart)
+{
+    bool status = true;
+
+    std::ofstream fout;
+
+    std::vector<Product> all_products = ProductManager::fetchAllProducts(); // fetch all products
+
+    // update stock & product status
+    std::string new_filename = "products_temp.csv";
+
+    fout.open(new_filename);
+
+    fout << "ID,Name,Rate,Quantity,Added On,Removed On,Last Modified,Status\n";
+
+    for (Product all_product : all_products)
+    {
+        for (Product cart_product : cart)
+        {
+            if (all_product.getId() == cart_product.getId())
+            {
+                all_product.setQuantity(all_product.getQuantity() - cart_product.getQuantity());
+
+                if (all_product.getQuantity() <= 0)
+                    all_product.setStatus(PRODUCT_STATUS::OUT_OF_STOCK);
+
+                break;
+            }
+        }
+
+        fout << all_product.getId() << ","
+             << all_product.getName() << ","
+             << all_product.getRate() << ","
+             << all_product.getQuantity() << ","
+             << utility::getDateString(all_product.getAddedDate(), true) << ","
+             << utility::getDateString(all_product.getRemovedDate(), true) << ","
+             << utility::getDateString(all_product.getLastModifiedDate(), true) << ","
+             << all_product.getStatusString() << "\n";
+
+        if (!fout.good())
+            status = false;
+    }
+
+    fout.close();
+
+    if (status)
+        project_setup::updateFile(project_setup::filenames["product"], new_filename);
+
+    // update cart || sold products
+    fout.open(project_setup::filenames["sold_products"], std::ios::app);
+
+    for (Product &product : cart)
+    {
+        fout << product.getSalesId() << ","
+             << product.getId() << ","
+             << product.getName() << ","
+             << product.getRate() << ","
+             << product.getQuantity() << "\n";
+
+        if (!fout.good())
+            status = false;
+    }
+
+    fout.close();
+
+    return status;
+}
+
 // search by name
 std::vector<Product> ProductManager::searchByName(std::string target_name)
 {
@@ -278,10 +347,49 @@ std::vector<Product> ProductManager::searchByName(std::string target_name)
 std::vector<Product> ProductManager::fetchProductsByStatus(PRODUCT_STATUS status)
 {
     std::vector<Product> products;
+    std::vector<Product> all_products = ProductManager::fetchAllProducts(); // fetch all products
 
-    for (Product temp : ProductManager::fetchAllProducts())
+    for (Product temp : all_products)
         if (temp.getStatus() == status)
             products.push_back(temp);
+
+    return products;
+}
+
+// fetch all sold products
+std::vector<Product> ProductManager::fetchAllSoldProducts()
+{
+    Product product;
+    std::vector<Product> products;
+
+    std::string buffer;
+    std::vector<std::any> data;
+
+    std::ifstream fin(project_setup::filenames["sold_products"]);
+
+    std::getline(fin, buffer); // header
+
+    while (std::getline(fin, buffer))
+    {
+        data = utility::getLineData(buffer);
+
+        try
+        {
+            product.setSalesId(std::stoi(std::any_cast<std::string>(data[0])));
+            product.setId(std::stoi(std::any_cast<std::string>(data[1])));
+            product.setName(std::any_cast<std::string>(data[2]));
+            product.setRate(std::stod(std::any_cast<std::string>(data[3])));
+            product.setQuantity(std::stoi(std::any_cast<std::string>(data[4])));
+
+            products.push_back(product);
+        }
+        catch (const std::invalid_argument &e)
+        {
+            continue;
+        }
+    }
+
+    fin.close();
 
     return products;
 }

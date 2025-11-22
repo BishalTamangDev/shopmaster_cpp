@@ -27,6 +27,12 @@ void Product::setQuantity(int quantity)
     this->quantity = quantity;
 }
 
+// setter :: sales id
+void Product::setSalesId(int id)
+{
+    this->sales_id = id;
+}
+
 // setter :: added date
 void Product::setAddedDate(std::array<int, 6> added_date)
 {
@@ -94,43 +100,49 @@ int Product::getId() const
     return this->id;
 }
 
-// getter ::
+// getter :: quantity
 int Product::getQuantity() const
 {
     return this->quantity;
 }
 
-// getter ::
+// getter :: sales id
+int Product::getSalesId() const
+{
+    return this->sales_id;
+}
+
+// getter :: rate
 double Product::getRate() const
 {
     return this->rate;
 }
 
-// getter ::
+// getter :: name
 std::string Product::getName() const
 {
     return this->name;
 }
 
-// getter ::
+// getter :: added date
 std::array<int, 6> Product::getAddedDate() const
 {
     return this->added_date;
 }
 
-// getter ::
+// getter :: removed date
 std::array<int, 6> Product::getRemovedDate() const
 {
     return this->removed_date;
 }
 
-// getter ::
+// getter :: last modified date
 std::array<int, 6> Product::getLastModifiedDate() const
 {
     return this->last_modified_date;
 }
 
-// getter ::
+// getter :: status
 PRODUCT_STATUS Product::getStatus() const
 {
     return this->status;

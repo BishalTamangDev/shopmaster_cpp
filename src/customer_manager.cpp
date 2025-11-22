@@ -2,7 +2,7 @@
 #include "../include/customer_manager.h"
 
 // add customer
-bool CustomerManager::addCustomer(Customer customer)
+bool CustomerManager::add(Customer customer)
 {
     // get headline
     std::ofstream file(project_setup::filenames["customer"], std::ios::app);

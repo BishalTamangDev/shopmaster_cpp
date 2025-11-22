@@ -21,6 +21,7 @@ namespace product_interface
     void viewAvailableProducts();  // view available products
     void viewOutOfStockProducts(); // view out of stock products
     void viewRemovedProducts();    // view removed products
+    void viewSoldProducts();       // view sold products
 
     void viewFormattedProducts(std::vector<Product>); // view formatted product
 };

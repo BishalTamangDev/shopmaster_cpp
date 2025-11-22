@@ -263,7 +263,7 @@ void employeeMenu()
         std::getline(std::cin, choice);
 
         if (choice == "1")
-            inventory_interface::sell();
+            inventory_interface::sell(current_emp_id);
         else if (choice == "2")
             product_interface::searchById();
         else if (choice == "3")

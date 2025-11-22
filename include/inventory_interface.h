@@ -8,6 +8,7 @@
 
 namespace inventory_interface
 {
-    void sell();                                             // sell
+    void sell(int);                                          // sell product
     void showInvoice(Sales, std::vector<Product>, Customer); // generate invoice
+    bool saveInvoice(Sales, std::vector<Product>, Customer); // save invoice
 }

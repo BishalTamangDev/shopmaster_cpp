@@ -595,7 +595,8 @@ void product_interface::viewMenu()
         {2, "View Available Products"},
         {3, "View Out of Stock Products"},
         {4, "View Removed Products"},
-        {5, "Go Back"},
+        {5, "View Sold Products"},
+        {6, "Go Back"},
     };
 
     while (true)
@@ -617,6 +618,8 @@ void product_interface::viewMenu()
         else if (choice == "4")
             product_interface::viewRemovedProducts();
         else if (choice == "5")
+            product_interface::viewSoldProducts();
+        else if (choice == "6")
             return;
         else
         {
@@ -694,13 +697,50 @@ void product_interface::viewRemovedProducts()
     utility::pauseScreen();
 }
 
+// view sold products
+void product_interface::viewSoldProducts()
+{
+    utility::header("SOLD PRODUCTS");
+
+    std::vector<Product> sold_products = ProductManager::fetchAllSoldProducts(); // fetch all sold products
+
+    if (sold_products.empty())
+        utility::showMessage(utility::MESSAGE_TYPE::INFO, "No product sold yet!\n");
+    else
+    {
+        const std::vector<int> spaces = {6, 10, 25, 12, 7};
+
+        utility::showLine(spaces, {"ID", "Sales ID", "Name", "Rate", "Qty"});
+
+        for (Product product : sold_products)
+            utility::showLine(spaces, {std::to_string(product.getId()), std::to_string(product.getSalesId()), product.getName(), utility::getFormattedDouble(product.getRate()), std::to_string(product.getQuantity())});
+    }
+
+    std::cout << "\nPress any key to continue...";
+
+    utility::pauseScreen();
+}
+
 // view formatted product
 void product_interface::viewFormattedProducts(std::vector<Product> products)
 {
+    int total_qty = 0;
+    double total_net_price = 0.0;
+
     const std::vector<int> spaces = {6, 25, 12, 7, 12, 12, 15, 13};
 
     utility::showLine(spaces, {"ID", "Name", "Rate", "Qty", "Added On", "Removed On", "Last Modified", "Status"});
 
     for (Product &product : products)
+    {
+        total_net_price += product.getRate() * product.getQuantity();
+        total_qty += product.getQuantity();
         utility::showLine(spaces, {std::to_string(product.getId()), product.getName(), utility::getFormattedDouble(product.getRate()), std::to_string(product.getQuantity()), utility::getDateString(product.getAddedDate(), false), utility::getDateString(product.getRemovedDate(), false), utility::getDateString(product.getLastModifiedDate(), false), product.getStatusString()});
+    }
+
+    if (total_qty > 0)
+    {
+        std::cout << "\nTotal quantity  :: " << total_qty << "\n";
+        std::cout << "Total net price :: " << total_net_price << "\n";
+    }
 }

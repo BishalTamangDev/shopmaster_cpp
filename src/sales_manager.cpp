@@ -4,15 +4,37 @@
 #include "../include/customer_manager.h"
 
 // add new sales
-bool SalesManager::add()
+bool SalesManager::add(Sales sales)
 {
-    return true;
+    std::ofstream fout(project_setup::filenames["sales"], std::ios::app);
+
+    fout << sales.getSalesId() << ","
+         << sales.getEmployeeId() << ","
+         << sales.getNetAmount() << ","
+         << sales.getDiscount() << ","
+         << sales.getGrossAmount() << ","
+         << sales.getTender() << ","
+         << sales.getChange() << ","
+         << utility::getDateString(sales.getDate(), true) << "\n";
+
+    bool status = fout.good();
+
+    fout.close();
+
+    return status;
 }
 
 // generate sales id
 int SalesManager::generateId()
 {
     int id = 1;
+
+    std::vector<Sales> all_sales = SalesManager::fetchSalesReports(0, 0, 0);
+
+    for (Sales sales : all_sales)
+        if (sales.getSalesId() >= id)
+            id = sales.getSalesId() + 1;
+
     return id;
 }
 
