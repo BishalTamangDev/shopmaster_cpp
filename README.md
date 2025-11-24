@@ -38,12 +38,12 @@ After a successful build, you can run the application from the `build` directory
 
 **On Windows:**
 ```bash
-.\shop-master.exe
+.\shopmaster.exe
 ```
 
 **On Linux/macOS:**
 ```bash
-./shop-master
+./shopmaster
 ```
 
 ### Download
