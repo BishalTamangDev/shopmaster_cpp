@@ -26,7 +26,9 @@ int main()
 
     // Create directory if it doesn't exist
     if (!std::filesystem::exists(folder))
+    {
         std::filesystem::create_directory(folder);
+    }
 
     // Change working directory into the folder
     std::filesystem::current_path(folder);
@@ -57,22 +59,30 @@ void mainMenu()
         utility::header("LOGIN AS");
 
         for (const auto &option : options)
+        {
             utility::showOption(option.first, option.second);
+        }
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
+        {
             adminMain();
+        }
         else if (choice == "2")
         {
             login_status = employee_interface::login(current_emp_id);
 
             if (login_status)
+            {
                 employeeMenu();
+            }
         }
         else if (choice == "3")
+        {
             exit(0);
+        }
         else
         {
             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
@@ -131,7 +141,9 @@ void adminMain()
                 std::getline(std::cin, choice);
 
                 if (choice != "Y" && choice != "y")
+                {
                     return;
+                }
             }
             else
             {
@@ -187,23 +199,37 @@ void adminMenu()
         utility::header("ADMIN MENU");
 
         for (const auto &option : options)
+        {
             utility::showOption(option.first, option.second);
+        }
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
+        {
             product_interface::menu();
+        }
         else if (choice == "2")
+        {
             sales_interface::menu();
+        }
         else if (choice == "3")
+        {
             employee_interface::adminMenu();
+        }
         else if (choice == "4")
+        {
             customer_interface::adminMenu();
+        }
         else if (choice == "5")
+        {
             admin_interface::profileMenu();
+        }
         else if (choice == "6")
+        {
             shop_interface::menu();
+        }
         else if (choice == "7")
         {
             std::cout << "\nAre you sure you want to log out [y/n]? ";
@@ -243,13 +269,14 @@ void employeeMenu()
 
     const std::map<int, std::string> options = {
         {1, "Sell Product"},
-        {2, "Search Product By ID"},
-        {3, "Search Product By Name"},
+        {2, "Search Invoice"},
+        {3, "View Today's Sales"},
         {4, "View All Products"},
-        {5, "View Today's Sales"},
-        {6, "My Account Details"},
-        {7, "Log Out"},
-        {8, "Exit"},
+        {5, "Search Product By ID"},
+        {6, "Search Product By Name"},
+        {7, "My Account Details"},
+        {8, "Log Out"},
+        {9, "Exit"},
     };
 
     while (true)
@@ -257,24 +284,42 @@ void employeeMenu()
         utility::header("EMPLOYEE MENU");
 
         for (const auto &option : options)
+        {
             utility::showOption(option.first, option.second);
+        }
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
+        {
             inventory_interface::sell(current_emp_id);
+        }
         else if (choice == "2")
-            product_interface::searchById();
+        {
+            sales_interface::searchInvoice();
+        }
         else if (choice == "3")
-            product_interface::searchByName();
-        else if (choice == "4")
-            product_interface::viewAllProducts();
-        else if (choice == "5")
+        {
             sales_interface::viewTodaysSalesReport();
+        }
+        else if (choice == "4")
+        {
+            product_interface::viewAllProducts();
+        }
+        else if (choice == "5")
+        {
+            product_interface::searchById();
+        }
         else if (choice == "6")
+        {
+            product_interface::searchByName();
+        }
+        else if (choice == "7")
+        {
             employee_interface::showDetails(current_emp_id);
-        else if (choice == "7") // log out
+        }
+        else if (choice == "8") // log out
         {
             std::cout << "\nAre you sure you want to logout [y/n]? ";
             std::getline(std::cin, choice);

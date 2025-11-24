@@ -2,17 +2,23 @@
 #include "../include/product_manager.h"
 
 // add new product
-bool ProductManager::add(Product product)
+bool ProductManager::add(Product &product)
 {
     std::fstream file;
+
+    file.open(project_setup::filenames["product"], std::ios::in); // open file in append mode
+
+    if (!file)
+    {
+        return false;
+    }
+
     std::string line, headline;
+    std::getline(file, headline); // get headline
+
+    file.close();
 
     Product temp_product;
-
-    // open file and get headline
-    file.open(project_setup::filenames["product"], std::ios::in); // open file in append mode
-    std::getline(file, headline);                                 // get headline
-    file.close();
 
     // add process
     file.open(project_setup::filenames["product"], std::ios::app); // open file in append mode
@@ -29,23 +35,39 @@ bool ProductManager::add(Product product)
 
     bool status = file.good();
 
-    file.close();
-
     return status;
 }
 
 // fetch product
-bool ProductManager::fetch(int id, Product &product)
+bool ProductManager::fetch(int target_id, Product &product) const
 {
+    std::ifstream fin(project_setup::filenames["product"]);
+
+    if (!fin)
+    {
+        return false;
+    }
+
     bool found = false;
 
-    for (Product temp : ProductManager::fetchAllProducts())
+    std::string line;
+    std::vector<Product> products;
+
+    std::getline(fin, line); // skip header
+
+    while (std::getline(fin, line))
     {
-        if (temp.getId() == id)
+        Product temp_product;
+        std::vector<std::any> line_data = utility::getLineData(line);
+
+        if (temp_product.setByLineData(line_data))
         {
-            found = true;
-            product = temp;
-            break;
+            if (temp_product.getId() == target_id)
+            {
+                found = true;
+                product = temp_product;
+                break;
+            }
         }
     }
 
@@ -53,18 +75,24 @@ bool ProductManager::fetch(int id, Product &product)
 }
 
 // update product details
-bool ProductManager::update(int target_id, Product product)
+bool ProductManager::update(int target_id, Product &product)
 {
     std::fstream file;
-    std::string heading;
 
-    // open file and get headline
     file.open(project_setup::filenames["product"], std::ios::in);
-    std::getline(file, heading);
+
+    if (!file)
+    {
+        return false;
+    }
+
+    std::string heading;
+    std::getline(file, heading); // get header
     file.close();
 
-    // open file and update line
-    file.open("new_products.csv", std::ios::out);
+    std::string new_filename = "new_products.csv";
+
+    file.open(new_filename, std::ios::out);
     file << heading << "\n"; // write heading
 
     for (Product temp : ProductManager::fetchAllProducts())
@@ -89,22 +117,27 @@ bool ProductManager::update(int target_id, Product product)
 
     file.close();
 
-    return project_setup::updateFile(project_setup::filenames["product"], "new_products.csv");
+    return project_setup::updateFile(project_setup::filenames["product"], new_filename);
 }
 
 // remove product
 bool ProductManager::remove(int target_id)
 {
     std::fstream file;
-    std::string heading;
 
-    // open file and get headline
     file.open(project_setup::filenames["product"], std::ios::in);
-    std::getline(file, heading);
+
+    if (!file)
+    {
+        return false;
+    }
+
+    std::string heading, new_filename = "new_products.csv";
+    std::getline(file, heading); // get header
     file.close();
 
     // open file and update line
-    file.open("new_products.csv", std::ios::out);
+    file.open(new_filename, std::ios::out);
     file << heading << "\n"; // write heading
 
     for (Product temp : ProductManager::fetchAllProducts())
@@ -126,31 +159,33 @@ bool ProductManager::remove(int target_id)
             << temp.getStatusString() << "\n";
     }
 
-    file.close();
-
-    return project_setup::updateFile(project_setup::filenames["product"], "new_products.csv");
+    return project_setup::updateFile(project_setup::filenames["product"], new_filename);
 }
 
 // fetch all products
 std::vector<Product> ProductManager::fetchAllProducts()
 {
-    Product product;
-    std::string line;
-    std::vector<Product> products = {};
-    std::vector<std::any> line_data;
-
     std::ifstream fin(project_setup::filenames["product"]);
 
-    std::getline(fin, line); // headline
+    if (!fin)
+    {
+        return {};
+    }
+
+    std::string line;
+    std::getline(fin, line); // skip header
+    std::vector<Product> products;
 
     while (std::getline(fin, line))
     {
-        line_data = utility::getLineData(line);
-        product.setByLineData(line_data);
-        products.push_back(product);
-    }
+        Product product;
+        std::vector<std::any> line_data = utility::getLineData(line);
 
-    fin.close();
+        if (product.setByLineData(line_data))
+        {
+            products.push_back(std::move(product));
+        }
+    }
 
     return products;
 }
@@ -159,18 +194,26 @@ std::vector<Product> ProductManager::fetchAllProducts()
 bool ProductManager::restock(int id, int qty)
 {
     if (id <= 0)
+    {
         return false;
-
-    bool status = false;
+    }
 
     std::string headline;
-    std::string temporary_file = "products_temp.csv";
+
     std::fstream file;
 
-    // get headline
     file.open(project_setup::filenames["product"], std::ios::in);
-    std::getline(file, headline);
+
+    if (!file)
+    {
+        return false;
+    }
+
+    std::getline(file, headline); // get headline
     file.close();
+
+    bool status = false;
+    std::string temporary_file = "products_temp.csv";
 
     file.open(temporary_file, std::ios::out);
     file << headline << "\n";
@@ -180,10 +223,15 @@ bool ProductManager::restock(int id, int qty)
         if (product.getId() == id)
         {
             product.setQuantity(product.getQuantity() + qty); // update quantity
+
             if (product.getStatus() == PRODUCT_STATUS::OUT_OF_STOCK)
+            {
                 product.setStatus(PRODUCT_STATUS::AVAILABLE); // update product status
+            }
+
             status = true;
         }
+
         file
             << product.getId() << ","
             << product.getName() << ","
@@ -194,26 +242,44 @@ bool ProductManager::restock(int id, int qty)
             << utility::getDateString(product.getLastModifiedDate(), true) << ","
             << product.getStatusString() << "\n";
     }
-    file.close();
 
     if (status)
+    {
         status = project_setup::updateFile(project_setup::filenames["product"], temporary_file);
+    }
 
     return status;
 }
 
 // search by id
-bool ProductManager::searchById(int target_id, Product &product)
+bool ProductManager::searchById(int target_id, Product &product) const
 {
+    std::ifstream fin(project_setup::filenames["product"]);
+
+    if (!fin)
+    {
+        return false;
+    }
+
     bool found = false;
 
-    for (Product temp : ProductManager::fetchAllProducts())
+    std::string line;
+
+    std::getline(fin, line); // skip header
+
+    while (std::getline(fin, line))
     {
-        if (temp.getId() == target_id)
+        Product temp_product;
+        std::vector<std::any> line_data = utility::getLineData(line);
+
+        if (temp_product.setByLineData(line_data))
         {
-            product = temp;
-            found = true;
-            break;
+            if (temp_product.getId() == target_id)
+            {
+                product = temp_product;
+                found = true;
+                break;
+            }
         }
     }
 
@@ -221,36 +287,75 @@ bool ProductManager::searchById(int target_id, Product &product)
 }
 
 // check if the product name is already taken
-bool ProductManager::isValidProductName(std::string str)
+bool ProductManager::isValidProductName(std::string &new_name) const
 {
-    std::vector<Product> products = ProductManager::fetchAllProducts(); // fetch all products
+    std::ifstream fin(project_setup::filenames["product"]);
 
-    if (products.empty())
-        return true;
+    if (!fin)
+    {
+        return false;
+    }
 
-    for (Product product : products)
-        if (product.getName() == str)
-            return false;
+    bool valid_name = true;
 
-    return true;
+    std::string line;
+
+    std::getline(fin, line); // skip header
+
+    while (std::getline(fin, line))
+    {
+        Product temp_product;
+        std::vector<std::any> line_data = utility::getLineData(line);
+
+        if (temp_product.setByLineData(line_data))
+        {
+            std::string old_name = temp_product.getName();
+
+            utility::convertToLowerCase(old_name);
+            utility::convertToLowerCase(new_name);
+
+            if (temp_product.getName() == new_name)
+            {
+                valid_name = false;
+                break;
+            }
+        }
+    }
+
+    return valid_name;
 }
 
 // get valid id :: get greatest id + 1
-int ProductManager::getValidId()
+int ProductManager::getValidId() const
 {
-    int id = 1;
+    std::ifstream fin(project_setup::filenames["sold_products"]);
 
-    std::vector<Product> products = ProductManager::fetchAllProducts(); // fetch all products
-
-    if (!products.empty())
+    if (!fin)
     {
-        for (Product product : products)
-            if (product.getId() > id)
-                id = product.getId();
-        id++;
+        return 1;
     }
 
-    return id;
+    int new_id = 1;
+
+    std::string buffer;
+    std::vector<Product> products;
+
+    std::getline(fin, buffer); // skip header
+
+    while (std::getline(fin, buffer))
+    {
+        Product temp_product;
+
+        if (temp_product.setByLineData(utility::getLineData(buffer)))
+        {
+            if (temp_product.getId() >= new_id)
+            {
+                new_id = temp_product.getId() + 1;
+            }
+        }
+    }
+
+    return new_id;
 }
 
 // sell product
@@ -278,7 +383,9 @@ bool ProductManager::sellProduct(std::vector<Product> cart)
                 all_product.setQuantity(all_product.getQuantity() - cart_product.getQuantity());
 
                 if (all_product.getQuantity() <= 0)
+                {
                     all_product.setStatus(PRODUCT_STATUS::OUT_OF_STOCK);
+                }
 
                 break;
             }
@@ -294,13 +401,17 @@ bool ProductManager::sellProduct(std::vector<Product> cart)
              << all_product.getStatusString() << "\n";
 
         if (!fout.good())
+        {
             status = false;
+        }
     }
 
     fout.close();
 
     if (status)
+    {
         project_setup::updateFile(project_setup::filenames["product"], new_filename);
+    }
 
     // update cart || sold products
     fout.open(project_setup::filenames["sold_products"], std::ios::app);
@@ -314,16 +425,16 @@ bool ProductManager::sellProduct(std::vector<Product> cart)
              << product.getQuantity() << "\n";
 
         if (!fout.good())
+        {
             status = false;
+        }
     }
-
-    fout.close();
 
     return status;
 }
 
 // search by name
-std::vector<Product> ProductManager::searchByName(std::string target_name)
+std::vector<Product> ProductManager::searchByName(std::string &target_name) const
 {
     std::string name;
 
@@ -337,7 +448,9 @@ std::vector<Product> ProductManager::searchByName(std::string target_name)
         utility::convertToLowerCase(name); // convert name into lowercase
 
         if (name.find(target_name) != std::string::npos)
+        {
             products.push_back(temp);
+        }
     }
 
     return products;
@@ -346,12 +459,71 @@ std::vector<Product> ProductManager::searchByName(std::string target_name)
 // fetch products by status
 std::vector<Product> ProductManager::fetchProductsByStatus(PRODUCT_STATUS status)
 {
-    std::vector<Product> products;
-    std::vector<Product> all_products = ProductManager::fetchAllProducts(); // fetch all products
+    std::ifstream fin(project_setup::filenames["product"]);
 
-    for (Product temp : all_products)
-        if (temp.getStatus() == status)
-            products.push_back(temp);
+    if (!fin)
+    {
+        return {};
+    }
+
+    std::string buffer;
+    std::vector<Product> products;
+
+    std::getline(fin, buffer); // skip header
+
+    while (std::getline(fin, buffer))
+    {
+        Product temp_product;
+
+        bool response = temp_product.setByLineData(utility::getLineData(buffer));
+
+        if (response && temp_product.getStatus() == status)
+        {
+            products.push_back(std::move(temp_product));
+        }
+    }
+
+    return products;
+}
+
+// fetch sold products by sales id
+std::vector<Product> ProductManager::fetchSoldProductsBySalesId(int sales_id)
+{
+    std::ifstream fin(project_setup::filenames["sold_products"]);
+
+    if (!fin)
+    {
+        return {};
+    }
+
+    std::string buffer;
+    std::vector<Product> products;
+
+    std::getline(fin, buffer); // skip header
+
+    while (std::getline(fin, buffer))
+    {
+        Product product;
+        std::vector<std::any> data = utility::getLineData(buffer);
+
+        try
+        {
+            product.setSalesId(std::stoi(std::any_cast<std::string>(data[0])));
+            product.setId(std::stoi(std::any_cast<std::string>(data[1])));
+            product.setName(std::any_cast<std::string>(data[2]));
+            product.setRate(std::stod(std::any_cast<std::string>(data[3])));
+            product.setQuantity(std::stoi(std::any_cast<std::string>(data[4])));
+
+            if (product.getSalesId() == sales_id)
+            {
+                products.push_back(product);
+            }
+        }
+        catch (const std::invalid_argument &e)
+        {
+            continue;
+        }
+    }
 
     return products;
 }
@@ -359,18 +531,23 @@ std::vector<Product> ProductManager::fetchProductsByStatus(PRODUCT_STATUS status
 // fetch all sold products
 std::vector<Product> ProductManager::fetchAllSoldProducts()
 {
-    Product product;
-    std::vector<Product> products;
+    std::ifstream fin(project_setup::filenames["sold_products"]);
+
+    if (!fin)
+    {
+        return {};
+    }
 
     std::string buffer;
     std::vector<std::any> data;
-
-    std::ifstream fin(project_setup::filenames["sold_products"]);
+    std::vector<Product> products;
 
     std::getline(fin, buffer); // header
 
     while (std::getline(fin, buffer))
     {
+        Product product;
+
         data = utility::getLineData(buffer);
 
         try
@@ -391,30 +568,37 @@ std::vector<Product> ProductManager::fetchAllSoldProducts()
 
     fin.close();
 
+    std::reverse(products.begin(), products.end()); // for placing latest sold product on top
+
     return products;
 }
 
 // fetch sold products by sales id
 std::vector<Product> fetchSoldProductsBySalesId(int)
 {
-    Product product;
+    std::ifstream fin(project_setup::filenames["sold_products"]);
+
+    if (!fin)
+    {
+        return {};
+    }
+
     std::vector<Product> sold_products;
 
     std::string line;
-    std::vector<std::any> data;
-
-    std::ifstream fin(project_setup::filenames["sold_products"]);
 
     std::getline(fin, line);
 
     while (std::getline(fin, line))
     {
-        data = utility::getLineData(line);
-        product.setByLineData(data);
-        sold_products.push_back(product);
-    }
+        Product product;
 
-    fin.close();
+        // individual data check
+        if (product.setByLineData(utility::getLineData(line)))
+        {
+            sold_products.push_back(product);
+        }
+    }
 
     return sold_products;
 }

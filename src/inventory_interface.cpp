@@ -4,17 +4,6 @@
 // sell
 void inventory_interface::sell(int current_emp_id)
 {
-    int id, qty, max_qty;
-    bool product_found, already_added;
-    double net_amount, discount, gross_amount, tender, change;
-
-    std::string buffer;
-    const std::vector<int> spaces = {6, 25, 12, 7, 10};
-
-    Sales sales;
-    Customer customer;
-
-    std::vector<Product> cart;
     std::vector<Product> available_products = ProductManager::fetchProductsByStatus(PRODUCT_STATUS::AVAILABLE);
 
     if (available_products.empty())
@@ -26,12 +15,26 @@ void inventory_interface::sell(int current_emp_id)
         return;
     }
 
+    int id, qty, max_qty;
+    bool product_found, already_added;
+    double net_amount, discount, gross_amount, tender, change;
+
+    std::string buffer;
+    const std::vector<int> spaces = {6, 25, 12, 7, 10};
+
+    Sales sales;
+    Customer customer;
+
+    std::vector<Product> cart;
+
     utility::header("SELL PRODUCT");
 
     utility::showLine(spaces, {"ID", "Name", "Rate", "Qty"});
 
     for (Product product : available_products)
+    {
         utility::showLine(spaces, {std::to_string(product.getId()), product.getName(), utility::getFormattedDouble(product.getRate()), std::to_string(product.getQuantity())});
+    }
 
     while (true)
     {
@@ -72,7 +75,9 @@ void inventory_interface::sell(int current_emp_id)
             }
 
             if (!product_found)
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo product found with this ID!");
+            }
             else
             {
                 // check if the product is already added
@@ -144,7 +149,9 @@ void inventory_interface::sell(int current_emp_id)
         std::getline(std::cin, buffer);
 
         if (buffer == "y" || buffer == "Y")
+        {
             continue;
+        }
         else
         {
             if (cart.empty())
@@ -247,7 +254,9 @@ void inventory_interface::sell(int current_emp_id)
 
         // set sales id to all products
         for (Product &product : cart)
+        {
             product.setSalesId(sales_id);
+        }
 
         // get customer details
         // name
@@ -268,74 +277,9 @@ void inventory_interface::sell(int current_emp_id)
         sales.setTender(tender);
         sales.setDate(utility::getCurrentDateTime());
 
-        saveInvoice(sales, cart, customer); // save sales
-        showInvoice(sales, cart, customer); // show invoide
+        sales_interface::saveInvoice(sales, cart, customer); // save sales
+        sales_interface::showInvoice(sales, cart, customer); // show invoide
 
         break;
     }
-}
-
-// show invoice
-void inventory_interface::showInvoice(Sales sales, std::vector<Product> cart, Customer customer)
-{
-    const std::vector<int> spaces = {6, 25, 12, 7, 10};
-
-    utility::header("INVOICE");
-
-    // show shop details
-    Shop shop;
-    ShopManager shopManager;
-    bool response = shopManager.fetch(shop);
-
-    if (!response)
-    {
-        utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "Shop details not found!");
-        std::cout << "\nPress any key to continue...";
-        utility::pauseScreen();
-        return;
-    }
-
-    std::cout << shop.getName() << "\n";
-    std::cout << shop.getAddress() << "\n";
-    std::cout << "Contact No. " << shop.getContactNumber() << "\n";
-    std::cout << "PAN " << shop.getPan() << "\n\n";
-
-    // show customer details
-    std::cout << "Customer name :: " << customer.getName() << "\n\n";
-
-    utility::showLine(spaces, {"ID", "Name", "Rate", "Qty", "Total"});
-
-    for (Product product : cart)
-    {
-        double total = product.getRate() * product.getQuantity();
-        utility::showLine(spaces, {std::to_string(product.getId()), product.getName(), utility::getFormattedDouble(product.getRate()), std::to_string(product.getQuantity()), utility::getFormattedDouble(total)});
-    }
-
-    std::cout << "\nNet amount        :: " << sales.getNetAmount() << "\n";
-    std::cout << "Discount          :: " << sales.getDiscount() << "%\n";
-    std::cout << "Gross amount      :: " << sales.getGrossAmount() << "\n";
-    std::cout << "Tender            :: " << sales.getTender() << "\n";
-    std::cout << "Change            :: " << sales.getChange() << "\n";
-
-    std::cout << "\nPress any key to continue...";
-
-    utility::pauseScreen();
-}
-
-// save invoice
-bool inventory_interface::saveInvoice(Sales sales, std::vector<Product> cart, Customer customer)
-{
-    // customer
-    CustomerManager customerManager;
-    bool customer_response = customerManager.add(customer);
-
-    // sales
-    SalesManager salesManager;
-    bool sales_response = salesManager.add(sales);
-
-    // sold products
-    ProductManager productManager;
-    bool sold_product_response = productManager.sellProduct(cart);
-
-    return customer_response && sales_response && sold_product_response;
 }

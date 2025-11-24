@@ -4,24 +4,33 @@
 // add new employee
 bool EmployeeManager::add(Employee emp)
 {
-    int valid_id = 1;
-
     std::fstream file;
-    std::string line, headline;
-
-    Employee temp_employee;
 
     // open file and get latest id + 1
     file.open(project_setup::filenames["employee"], std::ios::in); // open file in append mode
-    std::getline(file, headline);                              // get headline
+
+    if (!file)
+    {
+        return false;
+    }
+
+    int valid_id = 1;
+
+    std::string line, headline;
+    std::getline(file, headline); // get headline
 
     // get valid id
     while (std::getline(file, line))
     {
-        temp_employee.setByLineData(utility::getLineData(line));
-        valid_id = temp_employee.getId() + 1;
+        Employee temp_employee;
+
+        if (temp_employee.setByLineData(utility::getLineData(line)))
+        {
+            valid_id = temp_employee.getId() + 1;
+        }
     }
-    file.close();
+
+    file.close(); // close file
 
     emp.setId(valid_id);
 
@@ -41,23 +50,25 @@ bool EmployeeManager::add(Employee emp)
 
     bool status = file.good();
 
-    file.close();
-
     return status;
 }
 
 // update username
 bool EmployeeManager::update(Employee emp)
 {
-    std::string heading;
-
-    // open file and get headline
     std::fstream file(project_setup::filenames["employee"], std::ios::in);
+
+    if (!file)
+    {
+        return false;
+    }
+
+    std::string heading, temp_file = "new_employee.csv";
     std::getline(file, heading);
     file.close();
 
     // // open file and update line
-    file.open("new_employee.csv", std::ios::out);
+    file.open(temp_file, std::ios::out);
     file << heading << "\n"; // write heading
 
     for (Employee &temp : EmployeeManager::fetchAllEmployees())
@@ -89,19 +100,26 @@ bool EmployeeManager::update(Employee emp)
                 << emp.getStatusString() << "\n";
         }
     }
-    file.close();
 
-    return project_setup::updateFile(project_setup::filenames["employee"], "new_employee.csv");
+    file.close(); // close file
+
+    return project_setup::updateFile(project_setup::filenames["employee"], temp_file);
 }
 
 // remove employee
 bool EmployeeManager::remove(int target_id)
 {
     std::fstream file;
-    std::string heading, temporay_file = "employees_temp.csv";
 
     // open file and get headline
     file.open(project_setup::filenames["employee"], std::ios::in);
+
+    if (!file)
+    {
+        return false;
+    }
+
+    std::string heading, temporay_file = "employees_temp.csv";
     std::getline(file, heading);
     file.close();
 
@@ -135,25 +153,28 @@ bool EmployeeManager::remove(int target_id)
 }
 
 // fetch employee
-bool EmployeeManager::fetch(int id, Employee &emp)
+bool EmployeeManager::fetch(int target_id, Employee &employee)
 {
+    std::ifstream fin(project_setup::filenames["employee"]);
+
+    if (!fin)
+    {
+        return false;
+    }
+
     bool employee_found = false;
 
-    for (Employee temp : EmployeeManager::fetchAllEmployees())
-    {
-        if (temp.getId() == id)
-        {
-            emp.setId(temp.getId());
-            emp.setUsername(temp.getUsername());
-            emp.setPassword(temp.getPassword());
-            emp.setName(temp.getName());
-            emp.setContactNumber(temp.getContactNumber());
-            emp.setStatus(temp.getStatus());
-            emp.setAddedDate(temp.getAddedDate());
-            emp.setRemovedDate(temp.getRemovedDate());
-            emp.setModifiedDate(temp.getLastModified());
+    std::string line;
+    std::getline(fin, line); // heading
 
+    while (std::getline(fin, line))
+    {
+        Employee temp_employee;
+
+        if (temp_employee.setByLineData(utility::getLineData(line)) && temp_employee.getId() == target_id)
+        {
             employee_found = true;
+            employee = temp_employee;
             break;
         }
     }
@@ -180,17 +201,25 @@ bool EmployeeManager::login(std::string username, std::string password, int &cur
 }
 
 // get employee name
-std::string EmployeeManager::getEmployeeName(int id)
+std::string EmployeeManager::getEmployeeName(int target_id)
 {
-    std::string name = "Unknown";
+    std::ifstream fin(project_setup::filenames["employee"]);
 
-    auto employees = fetchAllEmployees();
-
-    for(Employee employee : employees)
+    if (!fin)
     {
-        if(employee.getId() == id)
+        return "Unknown";
+    }
+
+    std::string name = "Unknown";
+    std::string line;
+
+    while (std::getline(fin, line))
+    {
+        Employee temp_employee;
+
+        if (temp_employee.setByLineData(utility::getLineData(line)) && temp_employee.getId() == target_id)
         {
-            name = employee.getName();
+            name = temp_employee.getName();
             break;
         }
     }
@@ -201,24 +230,28 @@ std::string EmployeeManager::getEmployeeName(int id)
 // fetch all employees
 std::vector<Employee> EmployeeManager::fetchAllEmployees()
 {
-    Employee employee;
+    std::ifstream fin(project_setup::filenames["employee"]);
+
+    if (!fin)
+    {
+        return {};
+    }
 
     std::string line;
     std::vector<Employee> employees;
     std::vector<std::any> line_data;
 
-    std::ifstream file(project_setup::filenames["employee"]);
+    std::getline(fin, line); // heading
 
-    std::getline(file, line); // heading
-
-    while (std::getline(file, line))
+    while (std::getline(fin, line))
     {
-        line_data = utility::getLineData(line);
-        employee.setByLineData(line_data);
-        employees.push_back(employee);
-    }
+        Employee employee;
 
-    file.close();
+        if (employee.setByLineData(utility::getLineData(line)))
+        {
+            employees.push_back(employee);
+        }
+    }
 
     return employees;
 }

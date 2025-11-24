@@ -4,21 +4,28 @@
 // check if admin has been already registered
 bool AdminManager::registrationStatus()
 {
+    std::ifstream file(project_setup::filenames["admin"]);
+
+    if (!file)
+    {
+        return false;
+    }
+
     Admin admin;
 
     std::string line;
-    std::vector<std::any> data;
-    std::ifstream file(project_setup::filenames["admin"]);
 
-    std::getline(file, line); // healine
+    std::getline(file, line); // skip healine
+
     std::getline(file, line);
-    file.close(); // close file
 
     if (line.length() == 0)
+    {
         return false;
+    }
     else
     {
-        data = utility::getLineData(line);
+        std::vector<std::any> data = utility::getLineData(line);
         return admin.setByLineData(data); // set admin using line data
     }
 }
@@ -28,11 +35,14 @@ bool AdminManager::registration(Admin admin)
 {
     std::ofstream file(project_setup::filenames["admin"], std::ios::app);
 
+    if (!file)
+    {
+        return false;
+    }
+
     file << admin.getUsername() << "," << admin.getPassword() << "," << admin.getName() << "\n";
 
     bool status = file.good();
-
-    file.close();
 
     return status;
 }
@@ -40,22 +50,32 @@ bool AdminManager::registration(Admin admin)
 // login
 bool AdminManager::login(std::string username, std::string password)
 {
-    std::string line;
-    std::vector<std::any> data;
-
     std::ifstream file(project_setup::filenames["admin"]);
 
-    std::getline(file, line); // healine
+    if (!file)
+    {
+        return false;
+    }
+
+    std::string line;
+
+    std::getline(file, line); // skip healine
     std::getline(file, line);
-    file.close(); // close file
 
     if (line.length() == 0)
+    {
         return false;
+    }
     else
     {
         Admin admin;
-        data = utility::getLineData(line);
-        admin.setByLineData(data); // set admin using line data
+        std::vector<std::any> data = utility::getLineData(line);
+
+        if (!admin.setByLineData(data)) 
+        {
+            return false;
+        }
+
         return username == admin.getUsername() && password == admin.getPassword();
     }
 }
@@ -63,17 +83,24 @@ bool AdminManager::login(std::string username, std::string password)
 // fetch admin details
 bool AdminManager::fetch(Admin &admin)
 {
+    std::ifstream fin(project_setup::filenames["admin"]);
+
+    if (!fin)
+    {
+        return false;
+    }
+
     bool status = false;
 
     std::string line;
-    std::ifstream file(project_setup::filenames["admin"]);
 
-    std::getline(file, line); // heading
-    std::getline(file, line); // actual data
-    file.close();
+    std::getline(fin, line); // heading
+    std::getline(fin, line); // actual data
 
     if (!line.empty())
+    {
         status = admin.setByLineData(utility::getLineData(line));
+    }
 
     return status;
 }
@@ -81,13 +108,18 @@ bool AdminManager::fetch(Admin &admin)
 // update username
 bool AdminManager::update(Admin admin)
 {
-    std::string heading;
-
     std::fstream file;
 
     // open file and get headline
     file.open(project_setup::filenames["admin"], std::ios::in);
-    std::getline(file, heading);
+
+    if (!file)
+    {
+        return false;
+    }
+
+    std::string heading;
+    std::getline(file, heading); // get heading
     file.close();
 
     // open file and update line
@@ -97,8 +129,6 @@ bool AdminManager::update(Admin admin)
     file << admin.getUsername() << "," << admin.getPassword() << "," << admin.getName() << "\n";
 
     bool status = file.good();
-
-    file.close();
 
     return status;
 }

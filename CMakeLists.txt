@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # Project name and language
-project(shop-master VERSION 1.0 LANGUAGES CXX)
+project(shopmaster VERSION 1.0 LANGUAGES CXX)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -14,19 +14,19 @@ include_directories(include)
 file(GLOB SOURCES src/*.cpp)
 
 # Create executable
-add_executable(shop-master ${SOURCES})
+add_executable(shopmaster ${SOURCES})
 
 # Compiler warnings
 if (MSVC)
-    target_compile_options(shop-master PRIVATE /W4)
+    target_compile_options(shopmaster PRIVATE /W4)
 else()
-    target_compile_options(shop-master PRIVATE -Wall -Wextra -pedantic)
+    target_compile_options(shopmaster PRIVATE -Wall -Wextra -pedantic)
 endif()
 
 # Output executable to a folder named 'eses' inside the build directory
-set_target_properties(shop-master PROPERTIES
+set_target_properties(shopmaster PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/
 )
 
 # Optional: installation rule
-install(TARGETS shop-master DESTINATION bin)
+install(TARGETS shopmaster DESTINATION bin)

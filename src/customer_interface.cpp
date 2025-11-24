@@ -18,19 +18,29 @@ void customer_interface::adminMenu()
         utility::header("CUSTOMER MANAGEMENT MENU");
 
         for (const auto &option : options)
+        {
             utility::showOption(option.first, option.second);
+        }
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
+        {
             customer_interface::viewAll();
+        }
         else if (choice == "2")
+        {
             customer_interface::searchBySalesId();
+        }
         else if (choice == "3")
+        {
             customer_interface::searchByName();
+        }
         else if (choice == "4")
+        {
             return;
+        }
         else
         {
             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
@@ -47,12 +57,17 @@ void customer_interface::viewAll()
     std::vector<Customer> customers = CustomerManager::fetchAllCustomers();
 
     if (customers.size() == 0)
+    {
         utility::showMessage(utility::MESSAGE_TYPE::INFO, "No customers found!\n");
+    }
     else
     {
         utility::showLine({11, 25}, {"Sales ID", "Name"});
+
         for (Customer customer : customers)
+        {
             utility::showLine({11, 25}, {std::to_string(customer.getSalesId()), customer.getName()});
+        }
     }
 
     std::cout << "\nPress any key to continue...";
@@ -111,14 +126,18 @@ void customer_interface::searchBySalesId()
             }
 
             if (!found)
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nCustomer not found!");
+            }
         }
 
         std::cout << "\n\nDo you want to search another customer [y/n]? ";
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "Y")
+        {
             break;
+        }
     }
 }
 
@@ -164,12 +183,16 @@ void customer_interface::searchByName()
         }
 
         if (!found)
+        {
             utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nCustomer not found!\n");
+        }
 
         std::cout << "\nDo you want to search another customer [y/n]? ";
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "Y")
+        {
             break;
+        }
     }
 }

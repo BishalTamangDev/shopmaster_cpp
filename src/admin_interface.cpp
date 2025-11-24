@@ -36,7 +36,9 @@ void admin_interface::profileMenu()
         };
 
         for (const auto &option : options)
+        {
             utility::showOption(option.first, option.second);
+        }
 
         std::string choice;
 
@@ -44,13 +46,21 @@ void admin_interface::profileMenu()
         std::getline(std::cin, choice);
 
         if (choice == "1")
+        {
             admin_interface::updateUsername(admin);
+        }
         else if (choice == "2")
+        {
             admin_interface::updatePassword(admin);
+        }
         else if (choice == "3")
+        {
             admin_interface::updateName(admin);
+        }
         else if (choice == "4")
+        {
             break;
+        }
         else
         {
             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\n\nInvalid choice!");
@@ -133,13 +143,17 @@ void admin_interface::updateName(Admin admin)
         utility::convertToLowerCase(old_name);
 
         if (new_name == old_name)
+        {
             utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nYou entered old name!");
+        }
         else
         {
             admin.setName(new_name);
 
             if (!adminManager.update(admin))
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nName updation failed!");
+            }
             else
             {
                 utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nName updated successfully!");
@@ -153,7 +167,9 @@ void admin_interface::updateName(Admin admin)
         std::getline(std::cin, choice);
 
         if (choice != "Y" && choice != "y")
+        {
             break;
+        }
     }
 }
 
@@ -175,7 +191,9 @@ void admin_interface::updateUsername(Admin admin)
         std::getline(std::cin, new_username);
 
         if (new_username == admin.getUsername())
+        {
             utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nYou entered old username!");
+        }
         else
         {
             std::cout << "\nNew username       :: " << new_username;
@@ -184,7 +202,9 @@ void admin_interface::updateUsername(Admin admin)
 
             // proceed update
             if (!adminManager.update(admin))
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\n\nUsername updation failed!");
+            }
             else
             {
                 utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\n\nUsername updated successfully!");
@@ -198,9 +218,13 @@ void admin_interface::updateUsername(Admin admin)
         std::getline(std::cin, choice);
 
         if (choice != "Y" && choice != "y")
+        {
             break;
+        }
         else
+        {
             continue;
+        }
     }
 }
 
@@ -221,28 +245,36 @@ void admin_interface::updatePassword(Admin admin)
         std::getline(std::cin, old_password);
 
         if (old_password != admin.getPassword())
+        {
             utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nInvalid password!");
+        }
         else
         {
             std::cout << "\nEnter new password :: ";
             std::getline(std::cin, new_password);
 
             if (new_password == admin.getPassword())
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nYou entered old password!");
+            }
             else
             {
                 std::cout << "\nEnter again for confirmation :: ";
                 std::getline(std::cin, new_password_confirmation);
 
                 if (new_password != new_password_confirmation)
+                {
                     utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nPassword confirmation failed!");
+                }
                 else
                 {
                     admin.setPassword(new_password); // set new password
 
                     // proceed update
                     if (!adminManager.update(admin))
+                    {
                         utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nPassword updation failed!");
+                    }
                     else
                     {
                         utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nPassword updated successfully!");
@@ -258,6 +290,8 @@ void admin_interface::updatePassword(Admin admin)
         std::getline(std::cin, choice);
 
         if (choice != "Y" && choice != "y")
+        {
             break;
+        }
     }
 }

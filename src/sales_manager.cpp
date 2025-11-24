@@ -19,21 +19,38 @@ bool SalesManager::add(Sales sales)
 
     bool status = fout.good();
 
-    fout.close();
-
     return status;
 }
 
 // generate sales id
 int SalesManager::generateId()
 {
+    std::ifstream fin(project_setup::filenames["sales"]);
+
+    if (!fin)
+    {
+        return 1;
+    }
+
     int id = 1;
 
-    std::vector<Sales> all_sales = SalesManager::fetchSalesReports(0, 0, 0);
+    std::string line;
 
-    for (Sales sales : all_sales)
-        if (sales.getSalesId() >= id)
-            id = sales.getSalesId() + 1;
+    std::getline(fin, line); // skip heading
+
+    while (std::getline(fin, line))
+    {
+        Sales sales;
+        std::vector<std::any> data = utility::getLineData(line);
+
+        if (sales.setByLineData(data))
+        {
+            if (sales.getSalesId() >= id)
+            {
+                id = sales.getSalesId() + 1;
+            }
+        }
+    }
 
     return id;
 }
@@ -41,17 +58,32 @@ int SalesManager::generateId()
 // get sales by sales id
 bool SalesManager::fetchSalesReportById(int sales_id, Sales &sales)
 {
+    std::ifstream fin(project_setup::filenames["sales"]);
+
+    if (!fin)
+    {
+        return false;
+    }
+
     bool found = false;
 
-    std::vector<Sales> all_sales = SalesManager::fetchSalesReports(0, 0, 0);
+    std::string line;
 
-    for (Sales temp : all_sales)
+    std::getline(fin, line); // skip heading
+
+    while (std::getline(fin, line))
     {
-        if (temp.getSalesId() == sales_id)
+        Sales temp_sales;
+        std::vector<std::any> data = utility::getLineData(line);
+
+        if (temp_sales.setByLineData(data))
         {
-            sales = temp;
-            found = true;
-            break;
+            if (temp_sales.getSalesId() == sales_id)
+            {
+                sales = temp_sales;
+                found = true;
+                break;
+            }
         }
     }
 
@@ -94,41 +126,46 @@ std::vector<Sales> SalesManager::fetchSalesReportsByCustomerName(std::string tar
 // get all sales report
 std::vector<Sales> SalesManager::fetchSalesReports(int year, int month, int day)
 {
-    Sales sale;
-
-    bool status;
-
-    std::string line, sales_type;
-    std::vector<std::any> data;
-
-    std::vector<Sales> sales = {};
-
     std::ifstream fin(project_setup::filenames["sales"]);
 
-    std::getline(fin, line); // heading
+    if (!fin)
+    {
+        return {};
+    }
+
+    Sales sale;
+
+    std::string line;
+    std::vector<Sales> sales;
+
+    std::getline(fin, line); // skip heading
 
     while (std::getline(fin, line))
     {
-        data = utility::getLineData(line);
+        std::vector<std::any> data = utility::getLineData(line);
 
-        status = sale.setByLineData(data);
-
-        if (status)
+        if (sale.setByLineData(data))
         {
             if (year != 0 && month == 0 && day == 0)
             {
                 if (sale.getDate()[0] == year)
+                {
                     sales.push_back(sale);
+                }
             }
             else if (year != 0 && month != 0 && day == 0)
             {
                 if (sale.getDate()[0] == year && sale.getDate()[1] == month)
+                {
                     sales.push_back(sale);
+                }
             }
             else if (year != 0 && month != 0 && day != 0)
             {
                 if (sale.getDate()[0] == year && sale.getDate()[1] == month && sale.getDate()[2] == day)
-                sales.push_back(sale);
+                {
+                    sales.push_back(sale);
+                }
             }
             else if (year == 0 && month == 0 && day == 0)
             {
@@ -136,8 +173,6 @@ std::vector<Sales> SalesManager::fetchSalesReports(int year, int month, int day)
             }
         }
     }
-
-    fin.close();
 
     return sales;
 }

@@ -5,6 +5,7 @@
 void employee_interface::adminMenu()
 {
     std::string choice;
+
     const std::map<int, std::string> options = {
         {1, "View Employeess"},
         {2, "Search Employee By ID"},
@@ -27,21 +28,37 @@ void employee_interface::adminMenu()
         std::getline(std::cin, choice);
 
         if (choice == "1")
+        {
             employee_interface::viewAll(); // view employees
+        }
         else if (choice == "2")
+        {
             employee_interface::searchById(); // search employee by id
+        }
         else if (choice == "3")
+        {
             employee_interface::searchByUsername(); // search employee by username
+        }
         else if (choice == "4")
+        {
             employee_interface::searchByName(); // search employee by name
+        }
         else if (choice == "5")
+        {
             employee_interface::add(); // add employee
+        }
         else if (choice == "6")
+        {
             employee_interface::update(); // update
+        }
         else if (choice == "7")
+        {
             employee_interface::remove(); // remove employee
+        }
         else if (choice == "8")
+        {
             return;
+        }
         else
         {
             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
@@ -62,9 +79,13 @@ void employee_interface::showDetails(int current_employee_id)
     utility::header("MY ACCOUNT DETAILS");
 
     if (!response)
+    {
         utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "Couldn't fetch employee details!");
+    }
     else
+    {
         employee.show(false);
+    }
 
     std::cout << "\n\nPress any key to continue...";
 
@@ -139,9 +160,11 @@ void employee_interface::viewAll()
     viewFormattedEmployees(employees); // view formatted employees
 
     if (employees.empty())
+    {
         utility::showMessage(utility::MESSAGE_TYPE::INFO, "No employees found!");
+    }
 
-    std::cout << "\n\nPress any key to go back...";
+    std::cout << "\nPress any key to go back...";
     utility::pauseScreen();
 }
 
@@ -179,7 +202,9 @@ void employee_interface::searchById()
             }
 
             if (!found)
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo employee found with this ID.");
+            }
         }
         catch (const std::invalid_argument &e)
         {
@@ -190,7 +215,9 @@ void employee_interface::searchById()
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "Y")
+        {
             break;
+        }
     }
 }
 
@@ -221,11 +248,15 @@ void employee_interface::searchByName()
             utility::convertToLowerCase(temp_name);
 
             if (temp_name.find(name) != std::string::npos)
+            {
                 results.push_back(employee);
+            }
         }
 
         if (results.empty())
+        {
             utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo employee found with this name.\n");
+        }
         else
         {
             std::cout << "\n";
@@ -236,7 +267,9 @@ void employee_interface::searchByName()
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "Y")
+        {
             break;
+        }
     }
 }
 
@@ -269,13 +302,17 @@ void employee_interface::searchByUsername()
         }
 
         if (!found)
+        {
             utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo employee found with this username.");
+        }
 
         std::cout << "\n\nDo you want to search another employee [y/n]? ";
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "Y")
+        {
             break;
+        }
     }
 }
 
@@ -286,7 +323,9 @@ void employee_interface::viewFormattedEmployees(std::vector<Employee> employees)
     utility::showLine(spaces, {"ID", "Name", "Username", "Password", "Contact No.", "Added On", "Removed On", "Last Modified", "Status"});
 
     for (Employee &employee : employees)
+    {
         utility::showLine(spaces, {std::to_string(employee.getId()), employee.getName(), employee.getUsername(), employee.getPassword(), employee.getContactNumber(), utility::getDateString(employee.getAddedDate(), false), utility::getDateString(employee.getRemovedDate(), false), utility::getDateString(employee.getLastModified(), false), employee.getStatusString()});
+    }
 }
 
 // employee :: add new employee
@@ -321,7 +360,9 @@ void employee_interface::add()
             }
 
             if (valid_username)
+            {
                 break;
+            }
             else
             {
                 utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nThis username is already take!");
@@ -329,7 +370,9 @@ void employee_interface::add()
                 std::getline(std::cin, choice);
 
                 if (choice != "Y" && choice != "y")
+                {
                     return;
+                }
             }
         }
 
@@ -364,20 +407,28 @@ void employee_interface::add()
         std::getline(std::cin, choice);
 
         if (choice != "Y" && choice != "y")
+        {
             utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nEmployee addition cancelled.");
+        }
         else
         {
             if (employeeManager.add(employee))
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nEmployee added successfully!");
+            }
             else
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nEmployee addition failed!");
+            }
         }
 
         std::cout << "\n\nDo you want to add another employee [y/n]?";
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "Y")
+        {
             break;
+        }
     }
 }
 
@@ -416,7 +467,9 @@ void employee_interface::update()
                 }
 
             if (id_found)
+            {
                 break;
+            }
             else
             {
                 utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nNo employee found with this ID!");
@@ -426,7 +479,9 @@ void employee_interface::update()
                 std::getline(std::cin, choice);
 
                 if (choice != "Y" && choice != "y")
+                {
                     return;
+                }
 
                 continue;
             }
@@ -443,7 +498,9 @@ void employee_interface::update()
             std::getline(std::cin, choice);
 
             if (choice != "Y" && choice != "y")
+            {
                 return;
+            }
 
             continue;
         }
@@ -479,7 +536,9 @@ void employee_interface::update()
         std::getline(std::cin, username);
 
         if (username.empty())
+        {
             break;
+        }
 
         for (Employee temp : employees)
         {
@@ -504,7 +563,9 @@ void employee_interface::update()
             std::getline(std::cin, choice);
 
             if (choice != "Y" && choice != "y")
+            {
                 return;
+            }
         }
     }
 
@@ -570,9 +631,13 @@ void employee_interface::update()
     bool response = employeeManager.update(employee);
 
     if (response)
+    {
         utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nEmployee updated successfully!");
+    }
     else
+    {
         utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nEmployee updation failed!");
+    }
 
     std::cout << "\n\nPress any key to continue...";
 
@@ -625,14 +690,18 @@ void employee_interface::remove()
                     id_found = true;
 
                     if (temp.getStatus() == EMPLOYEE_STATUS::INACTIVE)
+                    {
                         already_removed = true;
+                    }
 
                     break;
                 }
             }
 
             if (!id_found)
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nEmployee with this ID not found!");
+            }
             else
             {
                 // preview employee details
@@ -647,22 +716,30 @@ void employee_interface::remove()
 
                 // check if employee is already removed
                 if (already_removed)
+                {
                     utility::showMessage(utility::MESSAGE_TYPE::INFO, "\n\nThis employee is already removed!");
+                }
                 else
                 {
                     std::cout << "\n\nAre you sure you want to remove this employee [y/n]? ";
                     std::getline(std::cin, choice);
 
                     if (choice != "y" && choice != "Y")
+                    {
                         utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nEmployee removal cancelled!");
+                    }
                     else
                     {
                         // remove employee
                         EmployeeManager employeeManager;
                         if (employeeManager.remove(id))
+                        {
                             utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nEmployee removed successfully!");
+                        }
                         else
+                        {
                             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nCouldn't remove employee!");
+                        }
                     }
                 }
             }
@@ -672,6 +749,8 @@ void employee_interface::remove()
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "Y")
+        {
             return;
+        }
     }
 }

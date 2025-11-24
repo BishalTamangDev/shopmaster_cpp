@@ -4,18 +4,24 @@
 // check registration status
 bool ShopManager::registrationStatus()
 {
+    std::ifstream fin(project_setup::filenames["shop"]);
+
+    if (!fin)
+    {
+        return false;
+    }
+
     Shop shop;
 
     std::string line;
-    std::vector<std::any> data;
-    std::ifstream file(project_setup::filenames["shop"]);
 
-    std::getline(file, line); // healine
-    std::getline(file, line); // shop data
-    file.close();
+    std::getline(fin, line); // heading
+    std::getline(fin, line); // shop data
 
     if (line.empty())
+    {
         return false;
+    }
     else
     {
         return shop.setByLineData(utility::getLineData(line));
@@ -39,32 +45,38 @@ bool ShopManager::registration(Shop shop)
 // fetch shop details
 bool ShopManager::fetch(Shop &shop)
 {
-    std::string line;
+    std::ifstream fin(project_setup::filenames["shop"]);
 
-    std::ifstream file(project_setup::filenames["shop"]);
-
-    std::getline(file, line); // heading
-    std::getline(file, line); // shop details
-
-    if (!file.good())
+    if (!fin)
     {
-        file.close();
         return false;
     }
 
-    std::vector<std::any> data = utility::getLineData(line);
+    std::string line;
+    std::getline(fin, line); // heading
+    std::getline(fin, line); // shop details
 
-    return shop.setByLineData(data);
+    if (!fin)
+    {
+        return false;
+    }
+
+    return shop.setByLineData(utility::getLineData(line));
 }
 
 // update shop details
 bool ShopManager::update(Shop shop)
 {
     std::fstream file;
-    std::string headline;
 
-    // open shop file and get headline
     file.open(project_setup::filenames["shop"], std::ios::in);
+
+    if (!file)
+    {
+        return false;
+    }
+
+    std::string headline;
     std::getline(file, headline); // get headline
     file.close();
 

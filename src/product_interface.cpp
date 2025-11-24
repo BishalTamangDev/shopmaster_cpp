@@ -21,25 +21,41 @@ void product_interface::menu()
         utility::header("PRODUCT MANAGEMENT MENU");
 
         for (const auto &option : options)
+        {
             utility::showOption(option.first, option.second);
+        }
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
+        {
             product_interface::viewMenu();
+        }
         else if (choice == "2")
+        {
             product_interface::searchMenu();
+        }
         else if (choice == "3")
+        {
             product_interface::add();
+        }
         else if (choice == "4")
+        {
             product_interface::update();
+        }
         else if (choice == "5")
+        {
             product_interface::restock();
+        }
         else if (choice == "6")
+        {
             product_interface::remove();
+        }
         else if (choice == "7")
+        {
             return;
+        }
         else
         {
             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
@@ -56,7 +72,8 @@ void product_interface::add()
 
     int qty;
     double rate;
-    bool valid_name, valid_rate, valid_qty, product_added;
+    bool valid_rate, valid_qty, product_added;
+
     std::string name, rate_str, qty_str, choice;
 
     while (true)
@@ -70,10 +87,10 @@ void product_interface::add()
         std::cout << "Name        :: ";
         std::getline(std::cin, name);
 
-        valid_name = productManager.isValidProductName(name);
-
-        if (!valid_name)
+        if (!productManager.isValidProductName(name))
+        {
             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nThis product is already added!");
+        }
         else
         {
             product.setName(name);
@@ -94,7 +111,9 @@ void product_interface::add()
                         product.setRate(rate);
                     }
                     else
+                    {
                         utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid rate!\n");
+                    }
                 }
                 catch (const std::invalid_argument &e)
                 {
@@ -118,7 +137,9 @@ void product_interface::add()
                         product.setQuantity(qty);
                     }
                     else
+                    {
                         utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid quantity!\n");
+                    }
                 }
                 catch (const std::invalid_argument &e)
                 {
@@ -141,13 +162,17 @@ void product_interface::add()
             std::getline(std::cin, choice);
 
             if (choice != "y" && choice != "Y")
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nProduct addition cancelled!");
+            }
             else
             {
                 product_added = productManager.add(product);
 
                 if (!product_added)
+                {
                     utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nProduct addition failed!");
+                }
                 else
                 {
                     utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nProduct added successfully!");
@@ -159,7 +184,9 @@ void product_interface::add()
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "Y")
+        {
             break;
+        }
     }
 }
 
@@ -169,6 +196,7 @@ void product_interface::update()
     int id;
     double rate;
     bool valid_id, detail_updated;
+
     std::string buffer;
 
     Product product, updated_product;
@@ -199,11 +227,15 @@ void product_interface::update()
         if (valid_id)
         {
             if (!productManager.fetch(id, product))
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nProduct not found!\n");
+            }
             else
             {
                 if (product.getStatus() == PRODUCT_STATUS::REMOVED)
+                {
                     utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nYou cannot update the details of already removed products!\n");
+                }
                 else
                 {
                     // preview product details
@@ -227,8 +259,9 @@ void product_interface::update()
 
                         if (!buffer.empty())
                         {
-                            // todo :: check if the name is already taken
+                            // check if the name is already taken
                             utility::convertToWordCase(buffer);
+
                             if (buffer != product.getName())
                             {
                                 detail_updated = true;
@@ -243,7 +276,9 @@ void product_interface::update()
                             std::getline(std::cin, buffer);
 
                             if (buffer.empty())
+                            {
                                 break;
+                            }
                             else
                             {
                                 try
@@ -260,7 +295,9 @@ void product_interface::update()
                                         break;
                                     }
                                     else
+                                    {
                                         utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nInvalid rate!\n");
+                                    }
                                 }
                                 catch (const std::invalid_argument &e)
                                 {
@@ -270,7 +307,9 @@ void product_interface::update()
                         }
 
                         if (!detail_updated)
+                        {
                             utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo details to be updated updated!\n");
+                        }
                         else
                         {
                             updated_product.setLastModifiedDate(utility::getCurrentDateTime()); // get latest date
@@ -282,13 +321,19 @@ void product_interface::update()
                             std::getline(std::cin, buffer);
 
                             if (buffer != "y" && buffer != "Y")
+                            {
                                 utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nProduct update cancelled!\n");
+                            }
                             else
                             {
                                 if (productManager.update(id, updated_product))
+                                {
                                     utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nProduct updated successfully!\n");
+                                }
                                 else
+                                {
                                     utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nProduct update failed!\n");
+                                }
                             }
                         }
                     }
@@ -300,7 +345,9 @@ void product_interface::update()
         std::getline(std::cin, buffer);
 
         if (buffer != "y" && buffer != "y")
+        {
             break;
+        }
     }
 }
 
@@ -337,7 +384,9 @@ void product_interface::restock()
         if (valid_id)
         {
             if (!productManager.fetch(id, product))
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nProduct not found!\n");
+            }
             else
             {
                 // preview product details
@@ -347,7 +396,9 @@ void product_interface::restock()
 
                 // check if the product is removed
                 if (product.getStatus() == PRODUCT_STATUS::REMOVED)
+                {
                     utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nThis product is already removed!");
+                }
                 else
                 {
                     // proceed
@@ -359,9 +410,13 @@ void product_interface::restock()
                         qty = std::stoi(qty_str);
 
                         if (qty == 0)
+                        {
                             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid quantity!");
+                        }
                         else
+                        {
                             valid_qty = true;
+                        }
                     }
                     catch (const std::invalid_argument &e)
                     {
@@ -374,9 +429,13 @@ void product_interface::restock()
                         bool response = productManager.restock(id, qty);
 
                         if (response)
+                        {
                             utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nStock updated successfully!");
+                        }
                         else
+                        {
                             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nCouldn't update stock!");
+                        }
                     }
                 }
             }
@@ -386,7 +445,9 @@ void product_interface::restock()
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "y")
+        {
             break;
+        }
     }
 }
 
@@ -436,7 +497,9 @@ void product_interface::remove()
 
                 // check if the product is already removed
                 if (product.getStatus() == PRODUCT_STATUS::REMOVED)
+                {
                     utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nThis product is already removed!");
+                }
                 else
                 {
                     std::cout << "\nAre you sure you want to remove this product [y/n]? ";
@@ -445,9 +508,13 @@ void product_interface::remove()
                     if (choice == "y" || choice == "Y")
                     {
                         if (productManager.remove(id))
+                        {
                             utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nProduct removed successfully!");
+                        }
                         else
+                        {
                             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nProduct removal failed!");
+                        }
                     }
                 }
             }
@@ -457,7 +524,9 @@ void product_interface::remove()
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "Y")
+        {
             break;
+        }
     }
 }
 
@@ -477,17 +546,25 @@ void product_interface::searchMenu()
         utility::header("SEARCH PRODUCT MENU");
 
         for (const auto &option : options)
+        {
             utility::showOption(option.first, option.second);
+        }
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
+        {
             product_interface::searchById();
+        }
         else if (choice == "2")
+        {
             product_interface::searchByName();
+        }
         else if (choice == "3")
+        {
             return;
+        }
         else
         {
             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
@@ -524,9 +601,13 @@ void product_interface::searchById()
             product_found = productManager.searchById(id, product);
 
             if (product_found)
+            {
                 product.view();
+            }
             else
+            {
                 utility::showMessage(utility::MESSAGE_TYPE::INFO, "No product found with this ID!");
+            }
         }
         catch (const std::invalid_argument &e)
         {
@@ -537,7 +618,9 @@ void product_interface::searchById()
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "y")
+        {
             break;
+        }
     }
 }
 
@@ -560,7 +643,14 @@ void product_interface::searchByName()
 
         std::cout << "\n";
 
-        utility::showLine(spaces, {"ID", "Name", "Rate", "Qty", "Added On", "Removed On", "Last Modified", "Status"});
+        std::cout << std::left << std::setw(6) << "ID"
+                  << std::setw(25) << "Name"
+                  << std::setw(10) << std::right << "Rate" << "  "
+                  << std::setw(5) << "Qty" << "  "
+                  << std::setw(12) << std::left << "Added On"
+                  << std::setw(12) << "Removed On"
+                  << std::setw(15) << "Last Modified"
+                  << std::setw(11) << "Status" << "\n";
 
         for (Product product : ProductManager::fetchAllProducts())
         {
@@ -570,18 +660,30 @@ void product_interface::searchByName()
             if (name.find(target_name) != std::string::npos)
             {
                 found = true;
-                utility::showLine(spaces, {std::to_string(product.getId()), product.getName(), utility::getFormattedDouble(product.getRate()), std::to_string(product.getQuantity()), utility::getDateString(product.getAddedDate(), false), utility::getDateString(product.getRemovedDate(), false), utility::getDateString(product.getLastModifiedDate(), false), product.getStatusString()});
+
+                std::cout << std::left << std::setw(6) << product.getId()
+                          << std::setw(25) << product.getName()
+                          << std::setw(10) << std::right << product.getRate() << "  "
+                          << std::setw(5) << product.getQuantity() << "  "
+                          << std::setw(12) << std::left << utility::getDateString(product.getAddedDate(), false)
+                          << std::setw(12) << utility::getDateString(product.getRemovedDate(), false)
+                          << std::setw(15) << utility::getDateString(product.getLastModifiedDate(), false)
+                          << std::setw(11) << product.getStatusString() << "\n";
             }
         }
 
         if (!found)
+        {
             utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo product found with this name!\n");
+        }
 
         std::cout << "\nDo you want to search another product [y/n]? ";
         std::getline(std::cin, choice);
 
         if (choice != "y" && choice != "y")
+        {
             break;
+        }
     }
 }
 
@@ -604,23 +706,37 @@ void product_interface::viewMenu()
         utility::header("VIEW PRODUCT MENU");
 
         for (const auto &option : options)
+        {
             utility::showOption(option.first, option.second);
+        }
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
+        {
             product_interface::viewAllProducts();
+        }
         else if (choice == "2")
+        {
             product_interface::viewAvailableProducts();
+        }
         else if (choice == "3")
+        {
             product_interface::viewOutOfStockProducts();
+        }
         else if (choice == "4")
+        {
             product_interface::viewRemovedProducts();
+        }
         else if (choice == "5")
+        {
             product_interface::viewSoldProducts();
+        }
         else if (choice == "6")
+        {
             return;
+        }
         else
         {
             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
@@ -639,7 +755,9 @@ void product_interface::viewAllProducts()
     product_interface::viewFormattedProducts(products);
 
     if (products.empty())
+    {
         utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo product has been been added yet!\n");
+    }
 
     std::cout << "\nPress any key to continue...";
 
@@ -656,7 +774,9 @@ void product_interface::viewAvailableProducts()
     product_interface::viewFormattedProducts(available_products);
 
     if (available_products.empty())
+    {
         utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo product available!\n");
+    }
 
     std::cout << "\nPress any key to continue...";
 
@@ -673,7 +793,9 @@ void product_interface::viewOutOfStockProducts()
     product_interface::viewFormattedProducts(out_of_stock_products);
 
     if (out_of_stock_products.empty())
+    {
         utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo product out of stock!\n");
+    }
 
     std::cout << "\nPress any key to continue...";
 
@@ -690,7 +812,9 @@ void product_interface::viewRemovedProducts()
     product_interface::viewFormattedProducts(out_of_stock_products);
 
     if (out_of_stock_products.empty())
+    {
         utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo removed product found!\n");
+    }
 
     std::cout << "\nPress any key to continue...";
 
@@ -705,15 +829,25 @@ void product_interface::viewSoldProducts()
     std::vector<Product> sold_products = ProductManager::fetchAllSoldProducts(); // fetch all sold products
 
     if (sold_products.empty())
+    {
         utility::showMessage(utility::MESSAGE_TYPE::INFO, "No product sold yet!\n");
+    }
     else
     {
-        const std::vector<int> spaces = {6, 10, 25, 12, 7};
-
-        utility::showLine(spaces, {"ID", "Sales ID", "Name", "Rate", "Qty"});
+        std::cout << std::left << std::setw(6) << "ID"
+                  << std::setw(10) << "Sales ID"
+                  << std::setw(25) << "Name"
+                  << std::setw(10) << std::right << "Rate" << "  "
+                  << std::setw(5) << "Qty" << "\n";
 
         for (Product product : sold_products)
-            utility::showLine(spaces, {std::to_string(product.getId()), std::to_string(product.getSalesId()), product.getName(), utility::getFormattedDouble(product.getRate()), std::to_string(product.getQuantity())});
+        {
+            std::cout << std::left << std::setw(6) << product.getId()
+                      << std::setw(10) << product.getSalesId()
+                      << std::setw(25) << product.getName()
+                      << std::setw(10) << std::right << product.getRate() << "  "
+                      << std::setw(5) << product.getQuantity() << "\n";
+        }
     }
 
     std::cout << "\nPress any key to continue...";
@@ -727,15 +861,28 @@ void product_interface::viewFormattedProducts(std::vector<Product> products)
     int total_qty = 0;
     double total_net_price = 0.0;
 
-    const std::vector<int> spaces = {6, 25, 12, 7, 12, 12, 15, 13};
-
-    utility::showLine(spaces, {"ID", "Name", "Rate", "Qty", "Added On", "Removed On", "Last Modified", "Status"});
+    std::cout << std::left << std::setw(6) << "ID"
+              << std::setw(25) << "Name"
+              << std::setw(10) << std::right << "Rate" << "  "
+              << std::setw(5) << "Qty" << "  "
+              << std::setw(12) << std::left << "Added On"
+              << std::setw(12) << "Removed On"
+              << std::setw(15) << "Last Modified"
+              << std::setw(11) << "Status" << "\n";
 
     for (Product &product : products)
     {
         total_net_price += product.getRate() * product.getQuantity();
         total_qty += product.getQuantity();
-        utility::showLine(spaces, {std::to_string(product.getId()), product.getName(), utility::getFormattedDouble(product.getRate()), std::to_string(product.getQuantity()), utility::getDateString(product.getAddedDate(), false), utility::getDateString(product.getRemovedDate(), false), utility::getDateString(product.getLastModifiedDate(), false), product.getStatusString()});
+
+        std::cout << std::left << std::setw(6) << product.getId()
+                  << std::setw(25) << product.getName()
+                  << std::setw(10) << std::right << product.getRate() << "  "
+                  << std::setw(5) << product.getQuantity() << "  "
+                  << std::setw(12) << std::left << utility::getDateString(product.getAddedDate(), false)
+                  << std::setw(12) << utility::getDateString(product.getRemovedDate(), false)
+                  << std::setw(15) << utility::getDateString(product.getLastModifiedDate(), false)
+                  << std::setw(11) << product.getStatusString() << "\n";
     }
 
     if (total_qty > 0)

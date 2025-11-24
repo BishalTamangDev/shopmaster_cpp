@@ -36,15 +36,21 @@ void shop_interface::menu()
         std::cout << "Address         :: " << shop.getAddress() << "\n\n";
 
         for (const auto &option : options)
+        {
             utility::showOption(option.first, option.second);
+        }
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
 
         if (choice == "1")
+        {
             shop_interface::update(shop);
+        }
         else if (choice == "2")
+        {
             return;
+        }
         else
         {
             utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid choice!");
@@ -141,7 +147,9 @@ bool shop_interface::registration()
             std::getline(std::cin, choice);
 
             if (choice != "Y" && choice != "y")
+            {
                 break;
+            }
         }
 
         utility::pauseScreen();
@@ -155,6 +163,7 @@ void shop_interface::update(Shop &shop)
 {
     int ward;
     bool details_changed = false;
+
     std::string choice;
     std::string name, pan, contact_number, currency, district, municipality, tole_village, ward_str;
 
@@ -287,9 +296,13 @@ void shop_interface::update(Shop &shop)
 
     // update details
     if (shopManager.update(shop))
+    {
         utility::showMessage(utility::MESSAGE_TYPE::SUCCESS, "\nShop updated successfully!");
+    }
     else
+    {
         utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nShop updation failed!");
+    }
 
     std::cout << "\n\nPress any key to continue...";
 
