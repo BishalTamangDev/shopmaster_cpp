@@ -448,7 +448,8 @@ void sales_interface::viewFormattedSalesReport(std::vector<Sales> sales)
               << std::setw(12) << "Gross Amount" << "  "
               << std::setw(8) << "Tender" << "  "
               << std::setw(8) << "Change" << "  "
-              << std::left << "Date" << "\n";
+              << std::setw(10) << std::left << "Date" << "  "
+              << "Time" << "\n";
 
     for (Sales &sale : sales)
     {
@@ -463,7 +464,8 @@ void sales_interface::viewFormattedSalesReport(std::vector<Sales> sales)
                   << std::setw(12) << sale.getGrossAmount() << "  "
                   << std::setw(8) << sale.getTender() << "  "
                   << std::setw(8) << sale.getChange() << "  "
-                  << std::left << utility::getDateString(sale.getDate(), false) << "\n";
+                  << std::setw(10) << std::left << utility::getDateString(sale.getDate(), false) << "  "
+                  << utility::getTimeString(sale.getTime(), false) << "\n";
     }
 
     std::cout << "\nTotal net amount     :: " << total_net_amount;
@@ -496,6 +498,8 @@ void sales_interface::showInvoice(Sales sales, std::vector<Product> cart, Custom
     std::cout << "PAN " << shop.getPan() << "\n\n";
 
     // show customer details
+    std::cout << "Date          :: " << utility::getDateString(sales.getDate(), false) << "\n";
+    std::cout << "Time          :: " << utility::getTimeString(sales.getTime(), false) << "\n";
     std::cout << "Customer name :: " << customer.getName() << "\n\n";
 
     std::cout << std::left << std::setw(6) << "ID"

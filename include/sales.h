@@ -8,7 +8,8 @@ class Sales
 private:
     int sales_id, employee_id;
     double net_amount, discount, gross_amount, tender, change;
-    std::array<int, 6> date;
+    std::array<int, 3> date;
+    std::array<int, 3> time;
 
 public:
     // constructor
@@ -21,7 +22,8 @@ public:
         gross_amount = 0.0;
         tender = 0.0;
         change = 0.0;
-        date = {0, 0, 0, 0, 0, 0};
+        date = {0, 0, 0};
+        time = {0, 0, 0};
     }
 
     // setters
@@ -32,7 +34,8 @@ public:
     void setGrossAmount(double);
     void setTender(double);
     void setChange(double);
-    void setDate(std::array<int, 6>);
+    void setDate(std::array<int, 3>);
+    void setTime(std::array<int, 3>);
     bool setByLineData(std::vector<std::any>);
 
     // getters
@@ -43,5 +46,6 @@ public:
     double getGrossAmount() const;
     double getTender() const;
     double getChange() const;
-    std::array<int, 6> getDate() const;
+    std::array<int, 3> getDate() const;
+    std::array<int, 3> getTime() const;
 };

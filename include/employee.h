@@ -20,9 +20,9 @@ private:
     std::string name;
     std::string contact_number;
     EMPLOYEE_STATUS status;
-    std::array<int, 6> added_date = {0, 0, 0};
-    std::array<int, 6> removed_date = {0, 0, 0};
-    std::array<int, 6> last_modified = {0, 0, 0};
+    std::array<int, 3> added_date = {0, 0, 0};
+    std::array<int, 3> removed_date = {0, 0, 0};
+    std::array<int, 3> last_modified = {0, 0, 0};
 
 public:
     Employee() // constructor
@@ -46,9 +46,9 @@ public:
     void setContactNumber(std::string);
     void setStatus(EMPLOYEE_STATUS);
     void setStatusByString(std::string);
-    void setAddedDate(std::array<int, 6>);
-    void setRemovedDate(std::array<int, 6>);
-    void setModifiedDate(std::array<int, 6>);
+    void setAddedDate(std::array<int, 3>);
+    void setRemovedDate(std::array<int, 3>);
+    void setModifiedDate(std::array<int, 3>);
     bool setByLineData(std::vector<std::any>); // set admin using line data
 
     // getters
@@ -59,9 +59,9 @@ public:
     std::string getContactNumber();
     EMPLOYEE_STATUS getStatus() const;
     std::string getStatusString() const;
-    std::array<int, 6> getAddedDate() const;
-    std::array<int, 6> getRemovedDate() const;
-    std::array<int, 6> getLastModified() const;
+    std::array<int, 3> getAddedDate() const;
+    std::array<int, 3> getRemovedDate() const;
+    std::array<int, 3> getLastModified() const;
     int getStatusInteger(EMPLOYEE_STATUS) const;
 
     void show(bool); // show employee details

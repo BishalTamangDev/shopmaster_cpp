@@ -147,7 +147,9 @@ void product_interface::add()
                 }
             }
 
-            product.setAddedDate(utility::getCurrentDateTime());
+            std::array<int, 6> current_date_time = utility::getCurrentDateTime();
+
+            product.setAddedDate({current_date_time[0], current_date_time[1], current_date_time[2]});
             product.setStatus(PRODUCT_STATUS::AVAILABLE);
 
             int id = productManager.getValidId();
@@ -312,7 +314,8 @@ void product_interface::update()
                         }
                         else
                         {
-                            updated_product.setLastModifiedDate(utility::getCurrentDateTime()); // get latest date
+                            std::array<int, 6> current_date_time = utility::getCurrentDateTime();
+                            updated_product.setLastModifiedDate({current_date_time[0], current_date_time[1], current_date_time[2]}); // get latest date
 
                             std::cout << "\nUPDATED PRODUCT DETAILS\n\n";
                             updated_product.view();

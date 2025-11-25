@@ -49,7 +49,9 @@ void utility::showLine(std::vector<int> space, std::vector<std::string> data)
     std::cout << std::left;
 
     for (const auto &datum : data)
+    {
         std::cout << std::setw(space[i++]) << datum;
+    }
 
     std::cout << "\n";
 }
@@ -75,7 +77,9 @@ std::vector<std::any> utility::getLineData(std::string line)
     std::vector<std::any> data;
 
     while (std::getline(ss, cell, ','))
+    {
         data.push_back(cell);
+    }
 
     return data;
 }
@@ -125,10 +129,12 @@ void utility::eraseWhiteSpace(std::string &str)
 }
 
 // get date string
-std::string utility::getDateString(std::array<int, 6> date, bool adding)
+std::string utility::getDateString(std::array<int, 3> date, bool adding)
 {
     if (date[0] == 0)
+    {
         return adding ? "" : "-";
+    }
     else
     {
         std::string date_string = "";
@@ -142,6 +148,27 @@ std::string utility::getDateString(std::array<int, 6> date, bool adding)
     }
 }
 
+// get time string
+std::string utility::getTimeString(std::array<int, 3> time, bool adding)
+{
+    if (time[0] == 0)
+    {
+        return adding ? "" : "-";
+    }
+    else
+    {
+        std::string time_string = "";
+        time[0] < 10 ? time_string.append("0") : time_string.append("");
+        time_string.append(std::to_string(time[0]));
+        time[1] < 10 ? time_string.append(":0") : time_string.append(":");
+        time_string.append(std::to_string(time[1]));
+        time[2] < 10 ? time_string.append(":0") : time_string.append(":");
+        time_string.append(std::to_string(time[2]));
+
+        return time_string;
+    }
+}
+
 // get formatted double as string
 std::string utility::getFormattedDouble(double dbl)
 {
@@ -150,28 +177,54 @@ std::string utility::getFormattedDouble(double dbl)
     return oss.str();
 }
 
-
 // get date from string
-std::array<int, 6> utility::getDateFromString(std::string str)
+std::array<int, 3> utility::getDateFromString(std::string str)
 {
     if (str == "")
-        return {0, 0, 0, 0, 0, 0};
+    {
+        return {0, 0, 0};
+    }
 
     std::string cell;
-    std::array<int, 6> date = {0, 0, 0, 0, 0, 0};
+    std::array<int, 3> data = {0, 0, 0};
 
     std::stringstream ss(str);
 
     std::getline(ss, cell, '-');
-    date[0] = std::stoi(cell);
+    data[0] = std::stoi(cell);
 
     std::getline(ss, cell, '-');
-    date[1] = std::stoi(cell);
+    data[1] = std::stoi(cell);
 
     std::getline(ss, cell, '-');
-    date[2] = std::stoi(cell);
+    data[2] = std::stoi(cell);
 
-    return date;
+    return data;
+}
+
+// get time from string
+std::array<int, 3> utility::getTimeFromString(std::string str)
+{
+    if (str == "")
+    {
+        return {0, 0, 0};
+    }
+
+    std::string cell;
+    std::array<int, 3> data = {0, 0, 0};
+
+    std::stringstream ss(str);
+
+    std::getline(ss, cell, ':');
+    data[0] = std::stoi(cell);
+
+    std::getline(ss, cell, ':');
+    data[1] = std::stoi(cell);
+
+    std::getline(ss, cell, ':');
+    data[2] = std::stoi(cell);
+
+    return data;
 }
 
 // get current date & time

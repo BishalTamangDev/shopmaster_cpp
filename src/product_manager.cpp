@@ -144,7 +144,8 @@ bool ProductManager::remove(int target_id)
     {
         if (temp.getId() == target_id)
         {
-            temp.setRemovedDate(utility::getCurrentDateTime());
+            std::array<int, 6> current_date_time = utility::getCurrentDateTime();
+            temp.setRemovedDate({current_date_time[0], current_date_time[1], current_date_time[2]});
             temp.setStatus(PRODUCT_STATUS::REMOVED);
         }
 

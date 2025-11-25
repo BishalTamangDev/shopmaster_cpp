@@ -55,10 +55,15 @@ void inventory_interface::sell(int current_emp_id)
         try
         {
             id = std::stoi(buffer);
+
+            if (id == 0)
+            {
+                utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nInvalid id!");
+            }
         }
         catch (const std::invalid_argument &e)
         {
-            utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nInvalid input!");
+            utility::showMessage(utility::MESSAGE_TYPE::FAILURE, "\nInvalid input!");
         }
 
         if (id != 0)
@@ -275,10 +280,17 @@ void inventory_interface::sell(int current_emp_id)
         sales.setGrossAmount(gross_amount);
         sales.setChange(change);
         sales.setTender(tender);
-        sales.setDate(utility::getCurrentDateTime());
+
+        std::array<int, 6> current_date_time = utility::getCurrentDateTime(); // current date & time
+
+        sales.setDate({current_date_time[0], current_date_time[1], current_date_time[2]});
+        sales.setTime({current_date_time[3], current_date_time[4], current_date_time[5]});
 
         sales_interface::saveInvoice(sales, cart, customer); // save sales
         sales_interface::showInvoice(sales, cart, customer); // show invoide
+
+        std::cout << "\nPress any key to continue...";
+        utility::pauseScreen();
 
         break;
     }

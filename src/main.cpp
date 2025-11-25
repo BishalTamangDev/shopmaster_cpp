@@ -338,7 +338,7 @@ void employeeMenu()
                 utility::pauseScreen();
             }
         }
-        else if (choice == "8")
+        else if (choice == "9")
         {
             std::cout << "\nExiting the program...";
             std::this_thread::sleep_for(std::chrono::seconds(1));

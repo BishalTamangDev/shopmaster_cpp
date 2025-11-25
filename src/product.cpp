@@ -34,19 +34,19 @@ void Product::setSalesId(int id)
 }
 
 // setter :: added date
-void Product::setAddedDate(std::array<int, 6> added_date)
+void Product::setAddedDate(std::array<int, 3> added_date)
 {
     this->added_date = added_date;
 }
 
 // setter :: removed date
-void Product::setRemovedDate(std::array<int, 6> removed_date)
+void Product::setRemovedDate(std::array<int, 3> removed_date)
 {
     this->removed_date = removed_date;
 }
 
 // setter :: last modified
-void Product::setLastModifiedDate(std::array<int, 6> last_modified_date)
+void Product::setLastModifiedDate(std::array<int, 3> last_modified_date)
 {
     this->last_modified_date = last_modified_date;
 }
@@ -63,13 +63,21 @@ void Product::setStatusByString(std::string str)
     utility::convertToLowerCase(str);
 
     if (str == "available")
+    {
         this->status = PRODUCT_STATUS::AVAILABLE;
+    }
     else if (str == "out of stock")
+    {
         this->status = PRODUCT_STATUS::OUT_OF_STOCK;
+    }
     else if (str == "removed")
+    {
         this->status = PRODUCT_STATUS::REMOVED;
+    }
     else
+    {
         this->status = PRODUCT_STATUS::UNKNOWN;
+    }
 }
 
 // setter :: set by line date
@@ -125,19 +133,19 @@ std::string Product::getName() const
 }
 
 // getter :: added date
-std::array<int, 6> Product::getAddedDate() const
+std::array<int, 3> Product::getAddedDate() const
 {
     return this->added_date;
 }
 
 // getter :: removed date
-std::array<int, 6> Product::getRemovedDate() const
+std::array<int, 3> Product::getRemovedDate() const
 {
     return this->removed_date;
 }
 
 // getter :: last modified date
-std::array<int, 6> Product::getLastModifiedDate() const
+std::array<int, 3> Product::getLastModifiedDate() const
 {
     return this->last_modified_date;
 }
@@ -152,13 +160,21 @@ PRODUCT_STATUS Product::getStatus() const
 std::string Product::getStatusString() const
 {
     if (this->status == PRODUCT_STATUS::AVAILABLE)
+    {
         return "Available";
+    }
     else if (this->status == PRODUCT_STATUS::OUT_OF_STOCK)
+    {
         return "Out of Stock";
+    }
     else if (this->status == PRODUCT_STATUS::REMOVED)
+    {
         return "Removed";
+    }
     else
+    {
         return "Unknown";
+    }
 }
 
 // view product details

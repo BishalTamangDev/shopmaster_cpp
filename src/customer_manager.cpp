@@ -41,7 +41,7 @@ bool CustomerManager::fetchCustomerBySalesId(int sales_id, Customer &customer)
 
         if (temp_customer.setByLineData(utility::getLineData(line)))
         {
-            if(temp_customer.getSalesId() == sales_id)
+            if (temp_customer.getSalesId() == sales_id)
             {
                 customer = temp_customer;
                 status = true;
@@ -51,8 +51,7 @@ bool CustomerManager::fetchCustomerBySalesId(int sales_id, Customer &customer)
     }
 
     return status;
-}     
-
+}
 
 // static :: get customer name
 std::string CustomerManager::getCustomerName(int sales_id)

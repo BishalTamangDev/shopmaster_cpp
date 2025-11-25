@@ -51,19 +51,19 @@ void Employee::setStatusByString(std::string str)
 }
 
 // setter :: added date
-void Employee::setAddedDate(std::array<int, 6> date)
+void Employee::setAddedDate(std::array<int, 3> date)
 {
     this->added_date = date;
 }
 
 // setter :: removed date
-void Employee::setRemovedDate(std::array<int, 6> date)
+void Employee::setRemovedDate(std::array<int, 3> date)
 {
     this->removed_date = date;
 }
 
 // setter :: modified date
-void Employee::setModifiedDate(std::array<int, 6> date)
+void Employee::setModifiedDate(std::array<int, 3> date)
 {
     this->last_modified = date;
 }
@@ -84,20 +84,22 @@ bool Employee::setByLineData(std::vector<std::any> data)
         // added date
         date_string = std::any_cast<std::string>(data[5]);
         if (date_string.empty())
-            this->setAddedDate({0, 0, 0, 0, 0, 0});
+        {
+            this->setAddedDate({0, 0, 0});
+        }
         else
         {
-            std::array<int, 6> arr_added_date = utility::getDateFromString(date_string);
+            std::array<int, 3> arr_added_date = utility::getDateFromString(date_string);
             this->setAddedDate(arr_added_date);
         }
 
         // removed date
         date_string = std::any_cast<std::string>(data[6]);
         if (date_string.empty())
-            this->setRemovedDate({0, 0, 0, 0, 0, 0});
+            this->setRemovedDate({0, 0, 0});
         else
         {
-            std::array<int, 6> arr_added_date = utility::getDateFromString(date_string);
+            std::array<int, 3> arr_added_date = utility::getDateFromString(date_string);
             this->setRemovedDate(arr_added_date);
         }
 
@@ -105,10 +107,10 @@ bool Employee::setByLineData(std::vector<std::any> data)
         date_string = std::any_cast<std::string>(data[7]);
 
         if (date_string.empty())
-            this->setModifiedDate({0, 0, 0, 0, 0, 0});
+            this->setModifiedDate({0, 0, 0});
         else
         {
-            std::array<int, 6> arr_last_modified = utility::getDateFromString(date_string);
+            std::array<int, 3> arr_last_modified = utility::getDateFromString(date_string);
             this->setModifiedDate(arr_last_modified);
         }
 
@@ -178,19 +180,19 @@ std::string Employee::getStatusString() const
 }
 
 // getter :: added date
-std::array<int, 6> Employee::getAddedDate() const
+std::array<int, 3> Employee::getAddedDate() const
 {
     return this->added_date;
 }
 
 // getter :: removed date
-std::array<int, 6> Employee::getRemovedDate() const
+std::array<int, 3> Employee::getRemovedDate() const
 {
     return this->removed_date;
 }
 
 // getter :: modified date
-std::array<int, 6> Employee::getLastModified() const
+std::array<int, 3> Employee::getLastModified() const
 {
     return this->last_modified;
 }

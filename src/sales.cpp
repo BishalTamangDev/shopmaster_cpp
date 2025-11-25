@@ -45,9 +45,15 @@ void Sales::setChange(double change)
 }
 
 // setter :: date
-void Sales::setDate(std::array<int, 6> date)
+void Sales::setDate(std::array<int, 3> date)
 {
     this->date = date;
+}
+
+// setter :: time
+void Sales::setTime(std::array<int, 3> time)
+{
+    this->time = time;
 }
 
 // setter :: using line data
@@ -63,6 +69,7 @@ bool Sales::setByLineData(std::vector<std::any> data)
         tender = std::stod(std::any_cast<std::string>(data[5]));
         change = std::stod(std::any_cast<std::string>(data[6]));
         date = utility::getDateFromString(std::any_cast<std::string>(data[7]));
+        time = utility::getTimeFromString(std::any_cast<std::string>(data[8]));
         return true;
     }
     catch (const std::invalid_argument &e)
@@ -115,7 +122,13 @@ double Sales::getChange() const
 }
 
 // getter :: date
-std::array<int, 6> Sales::getDate() const
+std::array<int, 3> Sales::getDate() const
 {
     return this->date;
+}
+
+// getter :: time
+std::array<int, 3> Sales::getTime() const
+{
+    return this->time;
 }

@@ -22,7 +22,9 @@ void employee_interface::adminMenu()
         utility::header("EMPLOYEE view MENU");
 
         for (const auto &options : options)
+        {
             utility::showOption(options.first, options.second);
+        }
 
         std::cout << "\nYour choice :: ";
         std::getline(std::cin, choice);
@@ -161,7 +163,7 @@ void employee_interface::viewAll()
 
     if (employees.empty())
     {
-        utility::showMessage(utility::MESSAGE_TYPE::INFO, "No employees found!");
+        utility::showMessage(utility::MESSAGE_TYPE::INFO, "\nNo employees found!\n");
     }
 
     std::cout << "\nPress any key to go back...";
@@ -391,7 +393,8 @@ void employee_interface::add()
         employee.setContactNumber(contact_number);
 
         employee.setStatus(EMPLOYEE_STATUS::ACTIVE);
-        employee.setAddedDate(utility::getCurrentDateTime());
+        std::array<int, 6> current_date_time = utility::getCurrentDateTime();
+        employee.setAddedDate({current_date_time[0], current_date_time[1], current_date_time[2]});
 
         // show employee details
         utility::header("ADD NEW EMPLOYEE");
@@ -458,13 +461,16 @@ void employee_interface::update()
 
             // check for id presence
             id_found = false;
+
             for (Employee temp : employees)
+            {
                 if (temp.getId() == id)
                 {
                     id_found = true;
                     employee = temp;
                     break;
                 }
+            }
 
             if (id_found)
             {
@@ -626,7 +632,9 @@ void employee_interface::update()
         return;
     }
 
-    employee.setModifiedDate(utility::getCurrentDateTime()); // update modified date
+    std::array<int, 6> current_date_time = utility::getCurrentDateTime();
+
+    employee.setModifiedDate({current_date_time[0], current_date_time[1], current_date_time[2]}); // update modified date
 
     bool response = employeeManager.update(employee);
 

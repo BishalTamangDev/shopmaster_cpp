@@ -29,10 +29,12 @@ namespace utility
     void convertToUpperCase(std::string &);                    // convert string into uppercase
     void eraseWhiteSpace(std::string &);                       // erase white space
 
-    std::string getDateString(std::array<int, 6>, bool); // get date string
+    std::string getDateString(std::array<int, 3>, bool); // get date string
+    std::string getTimeString(std::array<int, 3>, bool); // get time string
     std::string getFormattedDouble(double);              // get formatted double as string
 
-    std::array<int, 6> getDateFromString(std::string); // get date from string
+    std::array<int, 3> getDateFromString(std::string); // get date from string
+    std::array<int, 3> getTimeFromString(std::string); // get time from string
     std::array<int, 6> getCurrentDateTime();           // get current date & time
 
     std::vector<std::any> getLineData(std::string); // get line data

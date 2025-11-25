@@ -15,7 +15,8 @@ bool SalesManager::add(Sales sales)
          << sales.getGrossAmount() << ","
          << sales.getTender() << ","
          << sales.getChange() << ","
-         << utility::getDateString(sales.getDate(), true) << "\n";
+         << utility::getDateString(sales.getDate(), true) << ","
+         << utility::getTimeString(sales.getTime(), true) << "\n";
 
     bool status = fout.good();
 
